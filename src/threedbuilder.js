@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import TowerSection from 'towersection.js'
-
+import { PartOptions } from "./partbase.js";
+import { TowerSection } from "./towersection.js";
+import { RolloverPart } from "./rolloverpart.js";
 class thebuilder {
     scene;
     camera;
@@ -11,9 +12,12 @@ class thebuilder {
     objects = [];
     raycaster;
     rollOverMesh;
+    rollOverObject;
+    rollOverMaterial;
     gridHelper;
     partGeo;
     partMaterial;
+    chromeMaterial;
     appendToElement;
     mouse;
     height;
@@ -96,13 +100,39 @@ class thebuilder {
             this.onDocumentMouseDown,
             false
         );
-        this.fbxLoader("assets/3dmodels/25g.fbx", this.onRolloverLoad);
-
+        let rollOverOptions = new PartOptions();
+        //  name;
+        //  material;
+        //  importFile;
+        //  readyCallback;
+        this.rollOverMaterial = new THREE.MeshBasicMaterial({
+            color: 0xff0000,
+            opacity: 0.5,
+            transparent: true
+        });
+        rollOverOptions.material = this.rollOverMaterial;
+        rollOverOptions.materialType = "MeshBasicMaterial";
+        rollOverOptions.name = " Rollover Part";
+        rollOverOptions.importFile = "assets/3dmodels/25g.fbx";
+        console.log(rollOverOptions);
+        rollOverOptions.readyCallback = this.onRolloverLoad.bind(this);
+        this.rollOverObject = new RolloverPart(rollOverOptions);
+        this.rollOverObject.getPart();
         // Prepare Orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.target = new THREE.Vector3(0, 0, 0);
         this.controls.maxDistance = 5000;
 
+        const eMap = new THREE.CubeTextureLoader()
+            .setPath("assets/3dmodels/images/cmap/")
+            .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
+        this.chromeMaterial = new THREE.MeshLambertMaterial({
+            color: 0xfeb74c,
+            envMap: eMap,
+            reflectivity: 0.7
+        });
+
+        console.log(this.rollOverObject);
         // Prepare clock
         this.clock = new THREE.Clock();
 
@@ -131,87 +161,44 @@ class thebuilder {
     };
     onDocumentMouseMove = event => {
         event.preventDefault();
-        if (!this.partLoaded || !this.rollOverLoaded) {
-            return;
-        }
+
         this.mouse.set(
             (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
         );
-
+        if (!this.rollOverLoaded) {
+            return;
+        }
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
-        var intersects = this.raycaster.intersectObjects(this.objects);
+        const intersects = this.raycaster.intersectObjects(this.objects);
 
         if (intersects.length > 0) {
-            var intersect = intersects[0];
-
+            const intersect = intersects[0];
+            console.log(this.rollOverMesh);
+            const box = new THREE.Box3().setFromObject(this.rollOverMesh);
+            console.log(box.min, box.max, box.getSize(new THREE.Vector3()));
+            const size = box.getSize(new THREE.Vector3());
             this.rollOverMesh.position
                 .copy(intersect.point)
                 .add(intersect.face.normal);
             this.rollOverMesh.position
-                .divideScalar(this.rollOverMesh.height)
+                .divideScalar(size.y)
                 .floor()
-                .multiplyScalar(this.rollOverMesh.width)
-                .addScalar(this.rollOverMesh.height / 2);
+                .multiplyScalar(size.x)
+                .addScalar(size.y / 2);
         }
     };
 
-    fbxLoader = (path, callback) => {
-        const loader = new FBXLoader();
-
-        let binder = this;
-        loader.load(path, function(object) {
-            const eMap = new THREE.CubeTextureLoader()
-                .setPath("assets/3dmodels/images/cmap/")
-                .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
-            binder.partMaterial = new THREE.MeshLambertMaterial({
-                color: 0xfeb74c,
-                envMap: eMap,
-                reflectivity: 0.7
-            });
-
-            object.traverse(function(child) {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                    child.MeshLambertMaterial = binder.partMaterial;
-                }
-            });
-
-            callback(object);
-
-        });
-
-
-    };
-
-    onPartLoad = (part) => {
-        this.partLoaded = true;
-    }
-    onRolloverLoad = (rollover) => {
-        this.rollOverMaterial = new THREE.MeshBasicMaterial({
-            color: 0xff0000,
-            opacity: 0.5,
-            transparent: true
-        });
+    onRolloverLoad = rollover => {
+        console.log(rollover);
         this.rollOverMesh = rollover;
-        let binder = this;
-
-        this.rollOverMesh.traverse(function(child) {
-            if (child.isMesh) {
-                child.castShadow = false;
-                child.receiveShadow = false;
-                child.MeshBasicMaterial = binder.rollOverMaterial;
-            }
-        });
-
         this.scene.add(this.rollOverMesh);
         this.rollOverLoaded = true;
 
-    }
+    };
 
-    onVoxelLoad = (voxel) => {
-
+    onVoxelLoad = voxel => {
+        console.log(voxel)
         this.raycaster.setFromCamera(this.mouse, this.camera);
         let intersects = this.raycaster.intersectObjects(this.objects);
         if (intersects.length > 0) {
@@ -226,33 +213,41 @@ class thebuilder {
                 // create cube
             } else {
                 voxel.position.copy(intersect.point).add(intersect.face.normal);
+                const box = new THREE.Box3().setFromObject(voxel);
+                const size = box.getSize(new THREE.Vector3());
                 voxel.position
-                    .divideScalar(voxel.width)
+                    .divideScalar(size.y)
                     .floor()
-                    .multiplyScalar(voxel.height)
-                    .addScalar(voxel.height / 2);
+                    .multiplyScalar(size.x)
+                    .addScalar(size.y / 2);
                 this.scene.add(voxel);
 
                 this.objects.push(voxel);
             }
         }
-    }
+    };
 
     onDocumentMouseDown = event => {
         event.preventDefault();
-        if (!this.partLoaded || !this.rollOverLoaded) {
-            return;
-        }
+
         this.mouse.set(
             (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
         );
-
+        if (!this.rollOverLoaded) {
+            return;
+        }
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
         let intersects = this.raycaster.intersectObjects(this.objects);
 
         if (intersects.length > 0) {
-            this.fbxLoader("assets/3dmodels/25g.fbx", this.onVoxelLoad);
+            let newOptions = new PartOptions();
+            newOptions.material = this.chromeMaterial;
+            newOptions.name = "25G 10' Section";
+            newOptions.readyCallback = this.onVoxelLoad.bind(this);
+            newOptions.materialType = "MeshLambertMaterial";
+            let newPart = new TowerSection(newOptions);
+            newPart.getPart();
         }
     };
 }

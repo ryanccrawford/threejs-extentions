@@ -9,6 +9,10 @@ module.exports = {
         app: "./src/index.js",
         print: "./src/print.js",
         container: "./src/container.js",
+        PartOptions: "./src/partbase.js",
+        PartBase: "./src/partbase.js",
+        RolloverPart: "./src/rolloverpart.js",
+        TowerSection: "./src/towersection.js",
         thebuilder: "./src/threedbuilder.js"
     },
     devtool: "inline-source-map",
@@ -16,9 +20,7 @@ module.exports = {
         contentBase: "./dist"
     },
     plugins: [
-        new CopyPlugin([
-            { from: './src/assets', to: './assets' },
-        ]),
+        new CopyPlugin([{ from: "./src/assets", to: "./assets" }]),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             inject: false,
