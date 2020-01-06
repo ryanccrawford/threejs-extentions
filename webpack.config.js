@@ -29,8 +29,8 @@ module.exports = {
             appMountHtmlSnippet: '<div class="app-spinner"><i class="fa fa-spinner fa-spin fa-5x" aria-hidden="true"></i></div>',
             headHtmlSnippet: "<style>div.app-spinner {position: fixed;top:50%;left:50%;}</style >",
             bodyHtmlSnippet: "<div id='threed'></div>",
-            baseHref: "https://tower-builder.herokuapp.com/",
-            // devServer: "https://3dtb",
+            //baseHref: "https://tower-builder.herokuapp.com/",
+            devServer: "https://3stb",
             meta: [{
                 name: "description",
                 content: "3 Star Inc. 3D Tower Builder"

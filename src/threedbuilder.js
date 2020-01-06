@@ -3,6 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PartOptions } from "./partbase.js";
 import { TowerSection } from "./towersection.js";
 import { RolloverPart } from "./rolloverpart.js";
+import components from "./container.js";
+
 class thebuilder {
     scene;
     camera;
@@ -25,8 +27,12 @@ class thebuilder {
     isShiftDown = false;
     partLoaded = false;
     rollOverLoaded = false;
+    components;
+    mouseDisplay;
 
     constructor(height = 500, width = 800, appendToElement = "") {
+        this.components = new components();
+        console.log(this.components);
         this.height = height;
         this.width = width;
         this.appendToElement = appendToElement;
@@ -42,7 +48,7 @@ class thebuilder {
         this.scene.background = new THREE.Color(0xf0f0f0);
 
 
-
+        this.mouseDisplay = this.components.mousePosition(0,0,0,"mouse")
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
 
@@ -69,6 +75,9 @@ class thebuilder {
         document
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
+            
+            document.getElementsByTagName('body')[0].appendChild(this.mouseDisplay);
+
         this.isMouseOver = false;
         this.renderer.domElement.addEventListener(
             "mouseover",
@@ -127,9 +136,15 @@ class thebuilder {
     };
     animate = () => {
         requestAnimationFrame(this.animate);
+        this.updateMousePosition(this.mouse.x, this.mouse.y)
         this.render();
         this.update();
     };
+
+    updateMousePosition = (x, y) => {
+        const newMouseDisplay = this.components.mousePosition(x,y,0,"mouse");
+        this.components.replaceElement("mouse", newMouseDisplay);
+    }
 
     render = () => {
         this.renderer.render(this.scene, this.camera);
@@ -152,6 +167,7 @@ class thebuilder {
         this.mouse.set(
             (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
         );
+        this.updateMousePosition(this.mouse.x, this.mouse.y)
         if (!this.rollOverLoaded) {
             return;
         }
