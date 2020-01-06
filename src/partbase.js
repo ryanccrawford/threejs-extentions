@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 class PartBase {
-    static meshInMemory
+    static meshInMemory;
     name = "";
     importFile = "";
     partMesh;
@@ -11,7 +11,7 @@ class PartBase {
     materialType;
     height;
     width;
-    position;
+    size;
     isImportComplete = false;
     readyCallback;
 
@@ -32,53 +32,75 @@ class PartBase {
     };
 
     importComplete = part => {
-        this.height = part.height;
-        this.width = part.width;
-        this.position = part.position;
         if (!self.meshInMemory) {
             self.meshInMemory = part;
         }
         this.partMesh = part;
+        this.height = this.getHeight();
+        this.width = this.getWidth();
+        this.length = this.getLength();
         this.isImportComplete = true;
-        this.readyCallback(this.partMesh);
+        const binder = this
+        this.readyCallback(binder);
     };
 
+    position = () => {
+        return this.partMesh.position;
+    }
     fileImporter = () => {
-        let binder = this;
+        const binder = this;
         if (!self.meshInMemory) {
+
             this.loader.load(this.importFile, function(object) {
                 object.traverse(function(child) {
                     if (child.isMesh) {
                         child.castShadow = true;
                         child.receiveShadow = true;
-                        if (binder.materialType === "MeshLambertMaterial") {
-                            child.MeshLambertMaterial = binder.material;
-                        } else {
-                            child.MeshBasicMaterial = binder.material;
-                        }
-
+                        child.material = binder.material;
                     }
                 });
-
                 binder.importComplete(object);
             });
         } else {
             const mesh = this.clone();
-            const binder = this;
             mesh.traverse(function(child) {
                 if (child.isMesh) {
                     child.castShadow = true;
                     child.receiveShadow = true;
-                    if (binder.materialType === "MeshLambertMaterial") {
-                        child.MeshLambertMaterial = binder.material;
-                    } else {
-                        child.MeshBasicMaterial = binder.material;
-                    }
+                    child.material = binder.material;
                 }
             });
-            binder.importComplete(mesh);
-
+            binder.importComplete(mesh)
         }
+    };
+
+    getHeight = () => {
+        console.log("height: ");
+        const height = this.getSize().y;
+        console.log(height);
+        return height;
+    };
+
+    getWidth = () => {
+        console.log("width: ");
+        const width = this.getSize().x;
+        console.log(width);
+        return width;
+    };
+
+    getLength = () => {
+        console.log("length: ");
+        const length = this.getSize().z;
+        console.log(length);
+        return length;
+    };
+
+    getSize = () => {
+        if (!this.size) {
+            this.size = new THREE.Vector3();
+        }
+        const box = new THREE.Box3().setFromObject(this.partMesh);
+        return box.getSize(this.size);
     };
 
     clone = () => {

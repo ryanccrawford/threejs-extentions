@@ -41,24 +41,13 @@ class thebuilder {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0xf0f0f0);
 
-        this.gridHelper = new THREE.GridHelper(1000, 20);
-        this.scene.add(this.gridHelper);
+
 
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
 
-        let geometry = new THREE.PlaneBufferGeometry(1000, 1000);
-        geometry.rotateX(-Math.PI / 2);
 
-        this.plane = new THREE.Mesh(
-            geometry,
-            new THREE.MeshBasicMaterial({
-                visible: false
-            })
-        );
-        this.scene.add(this.plane);
 
-        this.objects.push(this.plane);
 
         // lights
 
@@ -101,10 +90,7 @@ class thebuilder {
             false
         );
         let rollOverOptions = new PartOptions();
-        //  name;
-        //  material;
-        //  importFile;
-        //  readyCallback;
+
         this.rollOverMaterial = new THREE.MeshBasicMaterial({
             color: 0xff0000,
             opacity: 0.5,
@@ -126,13 +112,14 @@ class thebuilder {
         const eMap = new THREE.CubeTextureLoader()
             .setPath("assets/3dmodels/images/cmap/")
             .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
-        this.chromeMaterial = new THREE.MeshLambertMaterial({
-            color: 0xfeb74c,
+        eMap.mapping = THREE.CubeRefractionMapping;
+        this.chromeMaterial = new THREE.MeshPhongMaterial({
+            color: 0xbec6d1,
             envMap: eMap,
-            reflectivity: 0.7
+            refractionRatio: 0.3,
+            reflectivity: 0.2
         });
 
-        console.log(this.rollOverObject);
         // Prepare clock
         this.clock = new THREE.Clock();
 
@@ -163,7 +150,7 @@ class thebuilder {
         event.preventDefault();
 
         this.mouse.set(
-            (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
+            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
         );
         if (!this.rollOverLoaded) {
             return;
@@ -174,30 +161,53 @@ class thebuilder {
 
         if (intersects.length > 0) {
             const intersect = intersects[0];
-            console.log(this.rollOverMesh);
-            const box = new THREE.Box3().setFromObject(this.rollOverMesh);
-            console.log(box.min, box.max, box.getSize(new THREE.Vector3()));
-            const size = box.getSize(new THREE.Vector3());
-            this.rollOverMesh.position
+
+            this.rollOverMesh.position()
                 .copy(intersect.point)
                 .add(intersect.face.normal);
-            this.rollOverMesh.position
-                .divideScalar(size.y)
+            this.rollOverMesh.position()
+                .divideScalar(50)
                 .floor()
-                .multiplyScalar(size.x)
-                .addScalar(size.y / 2);
+                .multiplyScalar(50)
+                .addScalar(this.rollOverMesh.getSize().y);
         }
     };
 
     onRolloverLoad = rollover => {
-        console.log(rollover);
+
         this.rollOverMesh = rollover;
-        this.scene.add(this.rollOverMesh);
+
+        const gridDividers =
+            1000 / this.rollOverMesh.getSize().z;
+        console.log(gridDividers);
+        this.gridHelper = new THREE.GridHelper(
+            1000,
+            gridDividers,
+            new THREE.Color(0xffffff),
+            new THREE.Color(0xC0C0C0)
+        );
+        this.scene.add(this.gridHelper);
+        let geometry = new THREE.PlaneBufferGeometry(1000, 1000);
+        geometry.rotateX(-Math.PI / 2);
+
+        this.plane = new THREE.Mesh(
+            geometry,
+            new THREE.MeshBasicMaterial({
+                visible: false
+            })
+        );
+        this.scene.add(this.plane);
+
+        this.objects.push(this.plane);
+
+
+        this.scene.add(this.rollOverMesh.partMesh);
         this.rollOverLoaded = true;
 
     };
 
     onVoxelLoad = voxel => {
+        console.log("inside onVoxelLoad")
         console.log(voxel)
         this.raycaster.setFromCamera(this.mouse, this.camera);
         let intersects = this.raycaster.intersectObjects(this.objects);
@@ -212,17 +222,17 @@ class thebuilder {
 
                 // create cube
             } else {
-                voxel.position.copy(intersect.point).add(intersect.face.normal);
-                const box = new THREE.Box3().setFromObject(voxel);
-                const size = box.getSize(new THREE.Vector3());
-                voxel.position
-                    .divideScalar(size.y)
-                    .floor()
-                    .multiplyScalar(size.x)
-                    .addScalar(size.y / 2);
-                this.scene.add(voxel);
+                voxel.position().copy(intersect.point).add(intersect.face.normal);
 
-                this.objects.push(voxel);
+                const size = voxel.getSize();
+                voxel.position()
+                    .divideScalar(50)
+                    .floor()
+                    .multiplyScalar(50)
+                    .addScalar(size.y);
+                this.scene.add(voxel.partMesh);
+
+                this.objects.push(voxel.partMesh);
             }
         }
     };
@@ -231,7 +241,7 @@ class thebuilder {
         event.preventDefault();
 
         this.mouse.set(
-            (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
+            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
         );
         if (!this.rollOverLoaded) {
             return;
@@ -245,7 +255,7 @@ class thebuilder {
             newOptions.material = this.chromeMaterial;
             newOptions.name = "25G 10' Section";
             newOptions.readyCallback = this.onVoxelLoad.bind(this);
-            newOptions.materialType = "MeshLambertMaterial";
+            newOptions.materialType = "MeshPhongMaterial";
             let newPart = new TowerSection(newOptions);
             newPart.getPart();
         }
