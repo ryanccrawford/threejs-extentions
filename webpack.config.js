@@ -29,7 +29,7 @@ module.exports = {
             appMountHtmlSnippet: '<div class="app-spinner"><i class="fa fa-spinner fa-spin fa-5x" aria-hidden="true"></i></div>',
             headHtmlSnippet: "<style>div.app-spinner {position: fixed;top:50%;left:50%;}</style >",
             bodyHtmlSnippet: "<div id='threed'></div>",
-            baseHref: "https://3dtb",
+            baseHref: "https://tower-builder.herokuapp.com/",
             // devServer: "https://3dtb",
             meta: [{
                 name: "description",
@@ -62,7 +62,7 @@ module.exports = {
             title: "3 Star Inc. 3D Tower Builder",
             window: {
                 env: {
-                    apiHost: "https://3dtb/api"
+                    apiHost: "https://tower-builder.herokuapp.com//api"
                 }
             }
         })
