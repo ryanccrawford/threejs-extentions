@@ -1,14 +1,17 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { PartOptions } from "./partbase.js";
 import { TowerSection } from "./towersection.js";
 import { RolloverPart } from "./rolloverpart.js";
 import components from "./container.js";
 
+
 class thebuilder {
     scene;
     camera;
     controls;
+    dragControls;
     renderer;
     lights = [];
     objects = [];
@@ -43,8 +46,9 @@ class thebuilder {
             1,
             10000
         );
-        this.camera.position.set(500, 800, 800);
-        this.camera.lookAt(0, 0, 0);
+        this.camera.position.z = 500; //(500, 800, 800);
+        this.camera.position.x = 500;
+        //this.camera.lookAt(0, 0, 0);
         this.scene = new THREE.Scene();
         //this.scene.background = new THREE.Color(0xf0f0f0);
 
@@ -118,7 +122,11 @@ class thebuilder {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.target = new THREE.Vector3(0, 0, 0);
         this.controls.maxDistance = 5000;
-
+        this.dragControls = new DragControls(
+            this.objects,
+            this.camera,
+            this.renderer.domElement
+        );
         const eMap = new THREE.CubeTextureLoader()
             .setPath("assets/3dmodels/images/cmap/")
             .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
@@ -185,7 +193,7 @@ class thebuilder {
         event.preventDefault();
         this.prevMousePosition = this.mouse;
         this.mouse.set(
-            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
+            (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
         );
         this.updateMousePosition(this.mouse.x, this.mouse.y);
         if (!this.rollOverLoaded) {
@@ -279,7 +287,7 @@ class thebuilder {
         this.prevMousePosition = this.mouse
         this.updateMousePosition(this.mouse.x, this.mouse.y);
         this.mouse.set(
-            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
+            (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
         );
         if (!this.rollOverLoaded) {
             return;
