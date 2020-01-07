@@ -14,7 +14,7 @@ function component() {
     btn.onclick = printMe;
     const containerElement = Components.fluidContainer();
     const jumbo = Components.jumbotron();
-    const text = Components.display4('Welcome');
+    const text = Components.display4('3 Star - 3D Tower Builder');
     jumbo.appendChild(text);
     jumbo.appendChild(btn);
 
@@ -23,10 +23,22 @@ function component() {
 
     return containerElement;
 }
-const renderArea = document.createElement("div");
+const fluidBottomContainer = new components().fluidContainer();
+const renderArea = new components().div();
+const layoutRow = new components().row();
+const layoutPartsListLeftSide = new components().col(2);
+const layoutViewAreaRightSide = new components().col(10);
+const newMouseDisplay = new components().mousePosition(0, 0, 0, "mouse");
+layoutPartsListLeftSide.appendChild(newMouseDisplay);
 renderArea.setAttribute("id", "renderarea");
 renderArea.style.textAlign = "center";
-document.body.appendChild(component()).appendChild(renderArea);
-
-const Thebuilder = new thebuilder(600, 1000, "renderarea");
+layoutViewAreaRightSide.appendChild(renderArea);
+layoutRow.appendChild(layoutPartsListLeftSide);
+layoutRow.appendChild(layoutViewAreaRightSide);
+document.body.appendChild(component());
+fluidBottomContainer.appendChild(layoutRow);
+document.body.appendChild(fluidBottomContainer);
+const theWidth = renderarea.clientWidth - 20;
+const theHeight = window.screen.availHeight - (0.30 * window.screen.availHeight);
+const Thebuilder = new thebuilder(theHeight, theWidth, "renderarea");
 Thebuilder.attach();

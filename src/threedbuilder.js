@@ -29,10 +29,11 @@ class thebuilder {
     rollOverLoaded = false;
     components;
     mouseDisplay;
+    canvas;
+    prevMousePosition;
 
     constructor(height = 500, width = 800, appendToElement = "") {
         this.components = new components();
-        console.log(this.components);
         this.height = height;
         this.width = width;
         this.appendToElement = appendToElement;
@@ -42,41 +43,38 @@ class thebuilder {
             1,
             10000
         );
-        this.camera.position.set(500, 800, 1300);
+        this.camera.position.set(500, 800, 800);
         this.camera.lookAt(0, 0, 0);
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0xf0f0f0);
+        //this.scene.background = new THREE.Color(0xf0f0f0);
 
 
-        this.mouseDisplay = this.components.mousePosition(0,0,0,"mouse")
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-
-
-
+        this.prevMousePosition = new THREE.Vector2();
 
         // lights
 
-        let ambientLight = new THREE.AmbientLight(0x606060);
+        const ambientLight = new THREE.AmbientLight(0x606060);
         this.scene.add(ambientLight);
         this.lights.push(ambientLight);
-        let directionalLight = new THREE.DirectionalLight(0xffffff);
+        const directionalLight = new THREE.DirectionalLight(0xffffff);
         directionalLight.position.set(1, 0.75, 0.5).normalize();
         this.scene.add(directionalLight);
         this.lights.push(directionalLight);
         this.renderer = new THREE.WebGLRenderer({
+            alpha: true,
             antialias: true
         });
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(width, height);
+        this.renderer.setSize(this.width, this.height);
     }
 
     attach = () => {
         document
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
-            
-            document.getElementsByTagName('body')[0].appendChild(this.mouseDisplay);
+
 
         this.isMouseOver = false;
         this.renderer.domElement.addEventListener(
@@ -92,7 +90,10 @@ class thebuilder {
             this.onDocumentMouseMove,
             false
         );
-
+        window.addEventListener(
+            "resize",
+            this.onResize
+        )
         this.renderer.domElement.addEventListener(
             "mousedown",
             this.onDocumentMouseDown,
@@ -123,10 +124,10 @@ class thebuilder {
             .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
         eMap.mapping = THREE.CubeRefractionMapping;
         this.chromeMaterial = new THREE.MeshPhongMaterial({
-            color: 0xbec6d1,
+            color: 0xc5c5c5,
             envMap: eMap,
-            refractionRatio: 0.3,
-            reflectivity: 0.2
+            refractionRatio: 0.8,
+            reflectivity: 0.3
         });
 
         // Prepare clock
@@ -136,23 +137,42 @@ class thebuilder {
     };
     animate = () => {
         requestAnimationFrame(this.animate);
-        this.updateMousePosition(this.mouse.x, this.mouse.y)
-        this.render();
         this.update();
+        this.render();
     };
 
-    updateMousePosition = (x, y) => {
-        const newMouseDisplay = this.components.mousePosition(x,y,0,"mouse");
-        this.components.replaceElement("mouse", newMouseDisplay);
+    mouseHasMoved = () => {
+
     }
+    updateMousePosition = (x, y) => {
+
+        const newMouseDisplay = this.components.mousePosition(x, y, 0, "mouse");
+        this.components.replaceElement("mouse", newMouseDisplay);
+    };
 
     render = () => {
         this.renderer.render(this.scene, this.camera);
     };
-    update = () => {
-        let delta = this.clock.getDelta();
 
+    update = () => {
+        const delta = this.clock.getDelta();
         this.controls.update(delta);
+    };
+
+    onResize = (event) => {
+        event.preventDefault();
+        const canvas = document.getElementsByTagName(
+            "canvas"
+        )[0];
+        const div = document.getElementById("renderarea");
+        canvas.height =
+            window.screen.availHeight - (0.3 * window.screen.availHeight);
+        canvas.width = div.clientWidth - 20;
+        this.camera.aspect = canvas.width / canvas.height;
+        this.width = canvas.width;
+        this.height = canvas.height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(canvas.width, canvas.height);
     };
 
     onDocumentMouseEnter = event => {
@@ -163,11 +183,11 @@ class thebuilder {
     };
     onDocumentMouseMove = event => {
         event.preventDefault();
-
+        this.prevMousePosition = this.mouse;
         this.mouse.set(
             (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
         );
-        this.updateMousePosition(this.mouse.x, this.mouse.y)
+        this.updateMousePosition(this.mouse.x, this.mouse.y);
         if (!this.rollOverLoaded) {
             return;
         }
@@ -178,29 +198,30 @@ class thebuilder {
         if (intersects.length > 0) {
             const intersect = intersects[0];
 
-            this.rollOverMesh.position()
+            this.rollOverMesh
+                .position()
                 .copy(intersect.point)
                 .add(intersect.face.normal);
-            this.rollOverMesh.position()
+            this.rollOverMesh
+                .position()
                 .divideScalar(50)
                 .floor()
                 .multiplyScalar(50)
-                .addScalar(this.rollOverMesh.getSize().y);
+                .addScalar(25);
+
         }
     };
 
     onRolloverLoad = rollover => {
-
         this.rollOverMesh = rollover;
 
-        const gridDividers =
-            1000 / this.rollOverMesh.getSize().z;
+        const gridDividers = 1000 / this.rollOverMesh.getSize().z;
         console.log(gridDividers);
         this.gridHelper = new THREE.GridHelper(
             1000,
             gridDividers,
             new THREE.Color(0xffffff),
-            new THREE.Color(0xC0C0C0)
+            new THREE.Color(0xc0c0c0)
         );
         this.scene.add(this.gridHelper);
         let geometry = new THREE.PlaneBufferGeometry(1000, 1000);
@@ -216,15 +237,13 @@ class thebuilder {
 
         this.objects.push(this.plane);
 
-
         this.scene.add(this.rollOverMesh.partMesh);
         this.rollOverLoaded = true;
-
     };
 
     onVoxelLoad = voxel => {
-        console.log("inside onVoxelLoad")
-        console.log(voxel)
+        console.log("inside onVoxelLoad");
+        console.log(voxel);
         this.raycaster.setFromCamera(this.mouse, this.camera);
         let intersects = this.raycaster.intersectObjects(this.objects);
         if (intersects.length > 0) {
@@ -236,18 +255,20 @@ class thebuilder {
                     this.objects.splice(this.objects.indexOf(intersect.object), 1);
                 }
 
-                // create cube
             } else {
-                voxel.position().copy(intersect.point).add(intersect.face.normal);
+                voxel
+                    .position()
+                    .copy(intersect.point)
+                    .add(intersect.face.normal);
 
                 const size = voxel.getSize();
-                voxel.position()
+                voxel
+                    .position()
                     .divideScalar(50)
                     .floor()
                     .multiplyScalar(50)
-                    .addScalar(size.y);
+                    .addScalar(25);
                 this.scene.add(voxel.partMesh);
-
                 this.objects.push(voxel.partMesh);
             }
         }
@@ -255,7 +276,8 @@ class thebuilder {
 
     onDocumentMouseDown = event => {
         event.preventDefault();
-
+        this.prevMousePosition = this.mouse
+        this.updateMousePosition(this.mouse.x, this.mouse.y);
         this.mouse.set(
             (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
         );
@@ -271,7 +293,6 @@ class thebuilder {
             newOptions.material = this.chromeMaterial;
             newOptions.name = "25G 10' Section";
             newOptions.readyCallback = this.onVoxelLoad.bind(this);
-            newOptions.materialType = "MeshPhongMaterial";
             let newPart = new TowerSection(newOptions);
             newPart.getPart();
         }
