@@ -168,15 +168,25 @@ class thebuilder {
 
     update = () => {
         const delta = this.clock.getDelta();
-        this.controls.update(delta);
+        if(this.controls.enabled){
+            this.controls.update(delta);
+        }
         //this.dragControls.update();
     };
 
     onDragStart = (event) => {
         this.controls.enabled = false;
+        if(event.object.material.emissive === undefined){
+            this.controls.enabled = true;
+            return;
+        }
         event.object.material.emissive.set(0xaaaaaa);
     };
     onDragEnd = (event) => {
+       
+        if(event.object.material.emissive === undefined){
+            return;
+        }
         this.controls.enabled = true;
         event.object.material.emissive.set(0x000000);
     };
