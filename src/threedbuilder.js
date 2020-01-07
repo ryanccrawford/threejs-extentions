@@ -52,7 +52,6 @@ class thebuilder {
         this.scene = new THREE.Scene();
         //this.scene.background = new THREE.Color(0xf0f0f0);
 
-
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.prevMousePosition = new THREE.Vector2();
@@ -72,13 +71,17 @@ class thebuilder {
         });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(this.width, this.height);
+        this.dragControls = new DragControls(
+            this.objects,
+            this.camera,
+            this.renderer.domElement
+        );
     }
 
     attach = () => {
         document
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
-
 
         this.isMouseOver = false;
         this.renderer.domElement.addEventListener(
@@ -94,10 +97,7 @@ class thebuilder {
             this.onDocumentMouseMove,
             false
         );
-        window.addEventListener(
-            "resize",
-            this.onResize
-        )
+        window.addEventListener("resize", this.onResize);
         this.renderer.domElement.addEventListener(
             "mousedown",
             this.onDocumentMouseDown,
@@ -122,11 +122,14 @@ class thebuilder {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.target = new THREE.Vector3(0, 0, 0);
         this.controls.maxDistance = 5000;
-        this.dragControls = new DragControls(
-            this.objects,
-            this.camera,
-            this.renderer.domElement
-        );
+
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.2;
+        this.dragControls.addEventListener("dragstart", this.onDragStart);
+
+        this.dragControls.addEventListener("dragend", this.onDragEnd);
+
+
         const eMap = new THREE.CubeTextureLoader()
             .setPath("assets/3dmodels/images/cmap/")
             .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
@@ -149,11 +152,8 @@ class thebuilder {
         this.render();
     };
 
-    mouseHasMoved = () => {
-
-    }
+    mouseHasMoved = () => {};
     updateMousePosition = (x, y) => {
-
         const newMouseDisplay = this.components.mousePosition(x, y, 0, "mouse");
         this.components.replaceElement("mouse", newMouseDisplay);
     };
@@ -165,16 +165,22 @@ class thebuilder {
     update = () => {
         const delta = this.clock.getDelta();
         this.controls.update(delta);
+        //this.dragControls.update();
     };
 
-    onResize = (event) => {
+    onDragStart = (event) => {
+        this.controls.enabled = false;
+        event.object.material.emissive.set(0xaaaaaa);
+    };
+    onDragEnd = (event) => {
+        this.controls.enabled = true;
+        event.object.material.emissive.set(0x000000);
+    };
+    onResize = event => {
         event.preventDefault();
-        const canvas = document.getElementsByTagName(
-            "canvas"
-        )[0];
+        const canvas = document.getElementsByTagName("canvas")[0];
         const div = document.getElementById("renderarea");
-        canvas.height =
-            window.screen.availHeight - (0.3 * window.screen.availHeight);
+        canvas.height = window.screen.availHeight - 0.3 * window.screen.availHeight;
         canvas.width = div.clientWidth - 20;
         this.camera.aspect = canvas.width / canvas.height;
         this.width = canvas.width;
@@ -216,7 +222,6 @@ class thebuilder {
                 .floor()
                 .multiplyScalar(50)
                 .addScalar(25);
-
         }
     };
 
@@ -262,7 +267,6 @@ class thebuilder {
 
                     this.objects.splice(this.objects.indexOf(intersect.object), 1);
                 }
-
             } else {
                 voxel
                     .position()
@@ -284,7 +288,7 @@ class thebuilder {
 
     onDocumentMouseDown = event => {
         event.preventDefault();
-        this.prevMousePosition = this.mouse
+        this.prevMousePosition = this.mouse;
         this.updateMousePosition(this.mouse.x, this.mouse.y);
         this.mouse.set(
             (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
