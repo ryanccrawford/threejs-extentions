@@ -20,9 +20,10 @@
     },
     "homepage": "https://github.com/ryanccrawford/threejs-extentions#readme",
     "dependencies": {
-        "lodash": "^4.17.15",
-        "jquery": "^3.4.1",
+        "@types/npm": "^2.0.31",
         "bootstrap": "^4.4.1",
+        "jquery": "^3.4.1",
+        "lodash": "^4.17.15",
         "popper.js": "^1.16.0",
         "three": "^0.111.0"
     },

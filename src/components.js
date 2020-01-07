@@ -21,6 +21,22 @@ class components {
         return display;
     }
 
+    button = (id, text, name, type = "button", color = "primary" , onClick, className = false) => {
+           const button = document.createElement("button");
+        if(className){
+           button.className = "btn btn-" + color;
+        }
+        button.setAttribute("id", id);
+        button.setAttribute("name", name);
+        button.setAttribute("type", type)
+        button.innerText = text;
+        if(onClick){
+            button.addEventListener("click", onClick);
+        }
+        console.log(button)
+        return button;
+    }
+    
     canvas = (height, width, id, color = null) => {
         const canvas = document.createElement("canvas");
         canvas.style.width = width;
@@ -108,6 +124,40 @@ class components {
         image.setAttribute("src", src);
         return image;
     }
+    img = (src, alt, id, className, height, width) => {
+        const image = document.createElement("img");
+        image.className = className;
+        id ? image.setAttribute("id", id) : true;
+        alt ? image.setAttribute("alt", alt) : true;
+        height ? image.setAttribute("height", height.toString) : true;
+        width ? image.setAttribute("width", width.toString()) : true;
+        image.setAttribute("src", src);
+        return image;
+    }
+    c = (tag) =>{
+        return document.createElement(tag);
+
+    }
+
+    buttonToggleGroup = (radioButtons = [], color = "primary") => {
+        const buttonGroup = this.div("btn-group btn-group-toggle")
+       // buttonGroup.setAttribute("data-toggle", "buttons")
+        
+        radioButtons.forEach(item => {
+            const label = this.c("label")
+            console.log(item)
+            let active = "";
+            if(item.getAttribute("active")){
+                active = " active";
+            }
+            label.className = "btn btn-" + color + active;
+            label.appendChild(item);
+            buttonGroup.appendChild(label);
+        })
+
+        return buttonGroup;
+
+    }   
 
     replaceElement = (elementIdToReplace, element) => {
         const elementBeingReplace = document.getElementById(elementIdToReplace);

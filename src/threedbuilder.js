@@ -4,7 +4,7 @@ import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { PartOptions } from "./partbase.js";
 import { TowerSection } from "./towersection.js";
 import { RolloverPart } from "./rolloverpart.js";
-import components from "./container.js";
+import components from "./components.js";
 
 
 class thebuilder {
@@ -71,11 +71,7 @@ class thebuilder {
         });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(this.width, this.height);
-        this.dragControls = new DragControls(
-            this.objects,
-            this.camera,
-            this.renderer.domElement
-        );
+        
     }
 
     attach = () => {
@@ -121,10 +117,18 @@ class thebuilder {
         // Prepare Orbit controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.target = new THREE.Vector3(0, 0, 0);
-        this.controls.maxDistance = 5000;
-
+        this.controls.maxDistance = 2000;
+        this.controls.enableRotate = false;
+        this.controls.enablePan = true;
+        this.controls.enableZoom = true;
+        this.controls.enableKeys = false;
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.2;
+        this.dragControls = new DragControls(
+            this.objects,
+            this.camera,
+            this.renderer.domElement
+        );
         this.dragControls.addEventListener("dragstart", this.onDragStart);
 
         this.dragControls.addEventListener("dragend", this.onDragEnd);
@@ -218,9 +222,9 @@ class thebuilder {
                 .add(intersect.face.normal);
             this.rollOverMesh
                 .position()
-                .divideScalar(50)
+                .divideScalar(14)
                 .floor()
-                .multiplyScalar(50)
+                .multiplyScalar(14)
                 .addScalar(25);
         }
     };
@@ -276,9 +280,9 @@ class thebuilder {
                 const size = voxel.getSize();
                 voxel
                     .position()
-                    .divideScalar(50)
+                    .divideScalar(14)
                     .floor()
-                    .multiplyScalar(50)
+                    .multiplyScalar(14)
                     .addScalar(25);
                 this.scene.add(voxel.partMesh);
                 this.objects.push(voxel.partMesh);

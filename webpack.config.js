@@ -8,12 +8,15 @@ module.exports = {
     entry: {
         app: "./src/index.js",
         print: "./src/print.js",
-        container: "./src/container.js",
+        components: "./src/components.js",
+        ToolIcon: "./src/toolicon.js",
+        ToolBar: "./src/toolbar.js",
         PartOptions: "./src/partbase.js",
         PartBase: "./src/partbase.js",
         RolloverPart: "./src/rolloverpart.js",
         TowerSection: "./src/towersection.js",
-        thebuilder: "./src/threedbuilder.js"
+        thebuilder: "./src/threedbuilder.js",
+        
     },
     devtool: "inline-source-map",
     devServer: {
@@ -27,7 +30,7 @@ module.exports = {
             template: require("html-webpack-template"),
             appMountId: "app",
             appMountHtmlSnippet: '<div class="app-spinner"><i class="fa fa-spinner fa-spin fa-5x" aria-hidden="true"></i></div>',
-            headHtmlSnippet: '<style>div.app - spinner { position: fixed; top: 50 %; left: 50 %; } </style >',
+            headHtmlSnippet: "<style>div.app-spinner {position: fixed;top:50%;left:50%;}</style >",
             bodyHtmlSnippet: "<div id='threed'></div>",
             //baseHref: "https://tower-builder.herokuapp.com/",
             devServer: "https://3stb",
