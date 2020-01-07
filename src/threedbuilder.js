@@ -80,25 +80,40 @@ class thebuilder {
             .appendChild(this.renderer.domElement);
 
         this.isMouseOver = false;
+        
         this.renderer.domElement.addEventListener(
             "mouseover",
             this.onDocumentMouseEnter
         );
+        
         this.renderer.domElement.addEventListener(
             "mouseout",
             this.onDocumentMouseOut
         );
+       
         this.renderer.domElement.addEventListener(
             "mousemove",
             this.onDocumentMouseMove,
             false
         );
+       
         window.addEventListener("resize", this.onResize);
+        
         this.renderer.domElement.addEventListener(
             "mousedown",
             this.onDocumentMouseDown,
             false
         );
+        
+        window.addEventListener("keypress", this.onKey);
+        
+        this.renderer.domElement.addEventListener(
+            "keypress",
+            this.onDocumentMouseDown,
+            false
+        );
+
+        
         let rollOverOptions = new PartOptions();
 
         this.rollOverMaterial = new THREE.MeshBasicMaterial({
@@ -174,6 +189,26 @@ class thebuilder {
         //this.dragControls.update();
     };
 
+    onKey = (event) => {
+        event.preventDefault();
+        console.log("keyPressed")
+        console.log(event.key)
+        switch (event.key) {
+            case "R":
+                const enabled = !this.dragControls.enabled
+                console.log(enabled)
+                this.dRragControls.enabled = enabled;
+                const enabled2 = !this.controls.enableRotate
+                console.log(enabled2)
+                this.controls.enableRotate = enabled2;  
+                this.controls.enabled = !this.controls.enabled;
+                break;
+            case "A":
+                //this.insertPart();
+                break;
+        }
+    }
+
     onDragStart = (event) => {
         this.controls.enabled = false;
         if(event.object.material.emissive === undefined){
@@ -211,9 +246,9 @@ class thebuilder {
     };
     onDocumentMouseMove = event => {
         event.preventDefault();
-        this.prevMousePosition = this.mouse;
+       
         this.mouse.set(
-            (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
+            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
         );
         this.updateMousePosition(this.mouse.x, this.mouse.y);
         if (!this.rollOverLoaded) {
@@ -269,7 +304,7 @@ class thebuilder {
     };
 
     onVoxelLoad = voxel => {
-        console.log("inside onVoxelLoad");
+        console.log("inside Voxel");
         console.log(voxel);
         this.raycaster.setFromCamera(this.mouse, this.camera);
         let intersects = this.raycaster.intersectObjects(this.objects);
@@ -282,6 +317,7 @@ class thebuilder {
                     this.objects.splice(this.objects.indexOf(intersect.object), 1);
                 }
             } else {
+            
                 voxel
                     .position()
                     .copy(intersect.point)
@@ -303,10 +339,11 @@ class thebuilder {
     onDocumentMouseDown = event => {
         event.preventDefault();
         this.prevMousePosition = this.mouse;
-        this.updateMousePosition(this.mouse.x, this.mouse.y);
+       
         this.mouse.set(
-            (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
+            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
         );
+        this.updateMousePosition(this.mouse.x, this.mouse.y);
         if (!this.rollOverLoaded) {
             return;
         }
