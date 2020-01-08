@@ -125,7 +125,7 @@ class thebuilder {
         rollOverOptions.materialType = "MeshBasicMaterial";
         rollOverOptions.name = " Rollover Part";
         rollOverOptions.importFile = "assets/3dmodels/25g.fbx";
-        console.log(rollOverOptions);
+
         rollOverOptions.readyCallback = this.onRolloverLoad.bind(this);
         this.rollOverObject = new RolloverPart(rollOverOptions);
         this.rollOverObject.getPart();
@@ -149,16 +149,7 @@ class thebuilder {
         this.dragControls.addEventListener("dragend", this.onDragEnd);
 
 
-        const eMap = new THREE.CubeTextureLoader()
-            .setPath("assets/3dmodels/images/cmap/")
-            .load(["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"]);
-        eMap.mapping = THREE.CubeRefractionMapping;
-        this.chromeMaterial = new THREE.MeshPhongMaterial({
-            color: 0xc5c5c5,
-            envMap: eMap,
-            refractionRatio: 0.5,
-            reflectivity: 0.2
-        });
+
 
         // Prepare clock
         this.clock = new THREE.Clock();
@@ -185,7 +176,9 @@ class thebuilder {
         const delta = this.clock.getDelta();
         if (this.controls.enabled) {
             this.controls.update(delta);
+
         }
+        this.camera.updateProjectionMatrix();
         //this.dragControls.update();
     };
 
@@ -235,8 +228,8 @@ class thebuilder {
         this.width = div.clientWidth - 20;
         this.camera.aspect = this.width / 600;
         canvas.width = this.width;
-        this.camera.updateProjectionMatrix();
         this.renderer.setSize(this.width, 600);
+        this.camera.updateProjectionMatrix();
     };
 
     onDocumentMouseEnter = event => {
@@ -247,13 +240,14 @@ class thebuilder {
     };
     onDocumentMouseMove = event => {
         event.preventDefault();
-        if (!this.rollOverLoaded) {
-            return;
-        }
+
 
         this.mouse.set(
             (event.clientX / this.width) * 2 - 1, -(event.clientY / 600) * 2 + 1
         );
+        if (!this.rollOverLoaded) {
+            return;
+        }
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
         const intersects = this.raycaster.intersectObjects(this.objects);
@@ -268,10 +262,10 @@ class thebuilder {
 
             this.rollOverMesh
                 .position
-                .divideScalar(14)
+                .divideScalar()
                 .floor()
-                .multiplyScalar(14)
-                .addScalar(20);
+                .multiplyScalar()
+                .addScalar();
         }
         this.updateMousePosition();
 
@@ -327,10 +321,10 @@ class thebuilder {
 
 
                 voxel.position
-                    .divideScalar(14)
+                    .divideScalar()
                     .floor()
-                    .multiplyScalar(14)
-                    .addScalar(14);
+                    .multiplyScalar()
+                    .addScalar();
                 this.scene.add(voxel);
                 this.objects.push(voxel);
             }
@@ -339,13 +333,14 @@ class thebuilder {
 
     onDocumentMouseDown = event => {
         event.preventDefault();
-        if (!this.rollOverLoaded) {
-            return;
-        }
+
 
         this.mouse.set(
             (event.clientX / this.width) * 2 - 1, -(event.clientY / 600) * 2 + 1
         );
+        if (!this.rollOverLoaded) {
+            return;
+        }
 
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
@@ -353,7 +348,6 @@ class thebuilder {
 
         if (intersects.length > 0) {
             let newOptions = new PartOptions();
-            newOptions.material = this.chromeMaterial;
             newOptions.name = "25G 10' Section";
             newOptions.readyCallback = this.onVoxelLoad.bind(this);
             let newPart = new TowerSection(newOptions);
