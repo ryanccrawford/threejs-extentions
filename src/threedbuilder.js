@@ -37,18 +37,18 @@ class thebuilder {
 
     constructor(height = 500, width = 800, appendToElement = "") {
         this.components = new components();
-        this.height = height;
+        this.height = 600;
         this.width = width;
         this.appendToElement = appendToElement;
         this.camera = new THREE.PerspectiveCamera(
             45,
-            this.width / this.height,
+            this.width / 600,
             1,
             10000
         );
-        this.camera.position.z = 500; //(500, 800, 800);
-        this.camera.position.x = 500;
-        //this.camera.lookAt(0, 0, 0);
+        this.camera.position.set(500, 1000, 1000);
+        //this.camera.position.x = 500;
+        this.camera.lookAt(0, 0, 0);
         this.scene = new THREE.Scene();
         //this.scene.background = new THREE.Color(0xf0f0f0);
 
@@ -70,8 +70,8 @@ class thebuilder {
             antialias: true
         });
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(this.width, this.height);
-        
+        this.renderer.setSize(this.width, 600);
+
     }
 
     attach = () => {
@@ -80,40 +80,40 @@ class thebuilder {
             .appendChild(this.renderer.domElement);
 
         this.isMouseOver = false;
-        
+
         this.renderer.domElement.addEventListener(
             "mouseover",
             this.onDocumentMouseEnter
         );
-        
+
         this.renderer.domElement.addEventListener(
             "mouseout",
             this.onDocumentMouseOut
         );
-       
+
         this.renderer.domElement.addEventListener(
             "mousemove",
             this.onDocumentMouseMove,
             false
         );
-       
+
         window.addEventListener("resize", this.onResize);
-        
+
         this.renderer.domElement.addEventListener(
             "mousedown",
             this.onDocumentMouseDown,
             false
         );
-        
+
         window.addEventListener("keypress", this.onKey);
-        
+
         this.renderer.domElement.addEventListener(
             "keypress",
             this.onDocumentMouseDown,
             false
         );
 
-        
+
         let rollOverOptions = new PartOptions();
 
         this.rollOverMaterial = new THREE.MeshBasicMaterial({
@@ -151,13 +151,13 @@ class thebuilder {
 
         const eMap = new THREE.CubeTextureLoader()
             .setPath("assets/3dmodels/images/cmap/")
-            .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
+            .load(["px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg"]);
         eMap.mapping = THREE.CubeRefractionMapping;
         this.chromeMaterial = new THREE.MeshPhongMaterial({
             color: 0xc5c5c5,
             envMap: eMap,
-            refractionRatio: 0.8,
-            reflectivity: 0.3
+            refractionRatio: 0.5,
+            reflectivity: 0.2
         });
 
         // Prepare clock
@@ -172,8 +172,8 @@ class thebuilder {
     };
 
     mouseHasMoved = () => {};
-    updateMousePosition = (x, y) => {
-        const newMouseDisplay = this.components.mousePosition(x, y, 0, "mouse");
+    updateMousePosition = () => {
+        const newMouseDisplay = this.components.mousePosition(this.mouse.x, this.mouse.y, 0, "mouse");
         this.components.replaceElement("mouse", newMouseDisplay);
     };
 
@@ -183,7 +183,7 @@ class thebuilder {
 
     update = () => {
         const delta = this.clock.getDelta();
-        if(this.controls.enabled){
+        if (this.controls.enabled) {
             this.controls.update(delta);
         }
         //this.dragControls.update();
@@ -195,13 +195,16 @@ class thebuilder {
         console.log(event.key)
         switch (event.key) {
             case "R":
-                const enabled = !this.dragControls.enabled
-                console.log(enabled)
-                this.dRragControls.enabled = enabled;
-                const enabled2 = !this.controls.enableRotate
-                console.log(enabled2)
-                this.controls.enableRotate = enabled2;  
-                this.controls.enabled = !this.controls.enabled;
+            case "r":
+                this.dragControls.enabled = false;
+                this.controls.enableRotate = true;
+                this.controls.enabled = true;
+                break;
+            case "S":
+            case "s":
+                this.dragControls.enabled = true;
+                this.controls.enableRotate = false;
+                this.controls.enabled = false;
                 break;
             case "A":
                 //this.insertPart();
@@ -210,32 +213,30 @@ class thebuilder {
     }
 
     onDragStart = (event) => {
-        this.controls.enabled = false;
-        if(event.object.material.emissive === undefined){
-            this.controls.enabled = true;
+        if (this.controls.enableRotate) {
+            return;
+        }
+        if (event.object.material.emissive === undefined) {
             return;
         }
         event.object.material.emissive.set(0xaaaaaa);
     };
     onDragEnd = (event) => {
-       
-        if(event.object.material.emissive === undefined){
+
+        if (event.object.material.emissive === undefined) {
             return;
         }
-        this.controls.enabled = true;
         event.object.material.emissive.set(0x000000);
     };
     onResize = event => {
         event.preventDefault();
         const canvas = document.getElementsByTagName("canvas")[0];
         const div = document.getElementById("renderarea");
-        canvas.height = window.screen.availHeight - 0.3 * window.screen.availHeight;
-        canvas.width = div.clientWidth - 20;
-        this.camera.aspect = canvas.width / canvas.height;
-        this.width = canvas.width;
-        this.height = canvas.height;
+        this.width = div.clientWidth - 20;
+        this.camera.aspect = this.width / 600;
+        canvas.width = this.width;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(canvas.width, canvas.height);
+        this.renderer.setSize(this.width, 600);
     };
 
     onDocumentMouseEnter = event => {
@@ -246,14 +247,13 @@ class thebuilder {
     };
     onDocumentMouseMove = event => {
         event.preventDefault();
-       
-        this.mouse.set(
-            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
-        );
-        this.updateMousePosition(this.mouse.x, this.mouse.y);
         if (!this.rollOverLoaded) {
             return;
         }
+
+        this.mouse.set(
+            (event.clientX / this.width) * 2 - 1, -(event.clientY / 600) * 2 + 1
+        );
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
         const intersects = this.raycaster.intersectObjects(this.objects);
@@ -262,31 +262,34 @@ class thebuilder {
             const intersect = intersects[0];
 
             this.rollOverMesh
-                .position()
+                .position
                 .copy(intersect.point)
                 .add(intersect.face.normal);
+
             this.rollOverMesh
-                .position()
+                .position
                 .divideScalar(14)
                 .floor()
                 .multiplyScalar(14)
-                .addScalar(25);
+                .addScalar(20);
         }
+        this.updateMousePosition();
+
     };
 
     onRolloverLoad = rollover => {
-        this.rollOverMesh = rollover;
 
-        const gridDividers = 1000 / this.rollOverMesh.getSize().z;
-        console.log(gridDividers);
+        this.rollOverMesh = rollover;
+        let gridSize = 1000
+        const gridDividers = 14;
         this.gridHelper = new THREE.GridHelper(
-            1000,
+            gridSize,
             gridDividers,
             new THREE.Color(0xffffff),
             new THREE.Color(0xc0c0c0)
         );
         this.scene.add(this.gridHelper);
-        let geometry = new THREE.PlaneBufferGeometry(1000, 1000);
+        let geometry = new THREE.PlaneBufferGeometry(gridSize, gridSize);
         geometry.rotateX(-Math.PI / 2);
 
         this.plane = new THREE.Mesh(
@@ -299,7 +302,7 @@ class thebuilder {
 
         this.objects.push(this.plane);
 
-        this.scene.add(this.rollOverMesh.partMesh);
+        this.scene.add(this.rollOverMesh);
         this.rollOverLoaded = true;
     };
 
@@ -317,36 +320,33 @@ class thebuilder {
                     this.objects.splice(this.objects.indexOf(intersect.object), 1);
                 }
             } else {
-            
-                voxel
-                    .position()
+
+                voxel.position
                     .copy(intersect.point)
                     .add(intersect.face.normal);
 
-                const size = voxel.getSize();
-                voxel
-                    .position()
+
+                voxel.position
                     .divideScalar(14)
                     .floor()
                     .multiplyScalar(14)
-                    .addScalar(25);
-                this.scene.add(voxel.partMesh);
-                this.objects.push(voxel.partMesh);
+                    .addScalar(14);
+                this.scene.add(voxel);
+                this.objects.push(voxel);
             }
         }
     };
 
     onDocumentMouseDown = event => {
         event.preventDefault();
-        this.prevMousePosition = this.mouse;
-       
-        this.mouse.set(
-            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
-        );
-        this.updateMousePosition(this.mouse.x, this.mouse.y);
         if (!this.rollOverLoaded) {
             return;
         }
+
+        this.mouse.set(
+            (event.clientX / this.width) * 2 - 1, -(event.clientY / 600) * 2 + 1
+        );
+
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
         let intersects = this.raycaster.intersectObjects(this.objects);
@@ -359,6 +359,8 @@ class thebuilder {
             let newPart = new TowerSection(newOptions);
             newPart.getPart();
         }
+
+        this.updateMousePosition();
     };
 }
 

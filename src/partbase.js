@@ -32,20 +32,19 @@ class PartBase {
     };
 
     importComplete = part => {
-        if (!self.meshInMemory) {
-            self.meshInMemory = part;
-        }
+
         this.partMesh = part;
         this.height = this.getHeight();
         this.width = this.getWidth();
         this.length = this.getLength();
         this.isImportComplete = true;
-        const binder = this
-        this.readyCallback(binder);
+        this.readyCallback(part);
     };
 
     position = () => {
-        return this.partMesh.position;
+        if (this.isImportComplete) {
+            return this.partMesh.position;
+        }
     }
     fileImporter = () => {
         const binder = this;
@@ -59,6 +58,7 @@ class PartBase {
                         child.material = binder.material;
                     }
                 });
+                self.meshInMemory = object;
                 binder.importComplete(object);
             });
         } else {
@@ -70,6 +70,7 @@ class PartBase {
                     child.material = binder.material;
                 }
             });
+
             binder.importComplete(mesh)
         }
     };
