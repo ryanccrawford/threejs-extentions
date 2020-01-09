@@ -38,13 +38,14 @@ class PartBase {
         this.width = this.getWidth();
         this.length = this.getLength();
         this.isImportComplete = true;
-        this.readyCallback(part);
+        this.readyCallback();
     };
 
     position = () => {
         if (this.isImportComplete) {
             return this.partMesh.position;
         }
+        return new THREE.Vector3(0,0,0)
     }
     fileImporter = () => {
         const binder = this;
@@ -58,6 +59,7 @@ class PartBase {
                         child.material = binder.material;
                     }
                 });
+                
                 self.meshInMemory = object;
                 binder.importComplete(object);
             });
