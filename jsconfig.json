@@ -8,5 +8,5 @@
       "target": "es6"
     },
     "exclude": ["node_modules"],
-    "include": ["src/**/*"]
+    "include": ["src/**/*", "server/server.js"]
 }

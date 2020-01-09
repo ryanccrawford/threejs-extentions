@@ -189,15 +189,15 @@ class thebuilder {
         switch (event.key) {
             case "R":
             case "r":
-                this.dragControls.enabled = false;
+                //this.dragControls.enabled = false;
                 this.controls.enableRotate = true;
-                this.controls.enabled = true;
+                //this.controls.enabled = true;
                 break;
             case "S":
             case "s":
-                this.dragControls.enabled = true;
-                this.controls.enableRotate = false;
-                this.controls.enabled = false;
+                this.dragControls.enabled = !this.dragControls.enabled;
+                //this.controls.enableRotate = !this.dragControls.enabled;
+                this.controls.enabled = !this.dragControls.enabled;
                 break;
             case "A":
                 //this.insertPart();

@@ -22,9 +22,12 @@
     "dependencies": {
         "@types/npm": "^2.0.31",
         "bootstrap": "^4.4.1",
+        "express": "^4.17.1",
         "jquery": "^3.4.1",
         "lodash": "^4.17.15",
+        "mysql2": "^2.1.0",
         "popper.js": "^1.16.0",
+        "sequelize": "^5.21.3",
         "three": "^0.111.0"
     },
     "devDependencies": {
