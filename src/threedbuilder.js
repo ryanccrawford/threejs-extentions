@@ -42,13 +42,14 @@ class thebuilder {
         this.width = width;
         this.appendToElement = appendToElement;
         this.camera = new THREE.PerspectiveCamera(
-            30,
+           20,
             this.width / 600,
             1,
             10000
         );
         this.camera.position.z = 500;
         this.camera.position.x = 500;
+        this.camera.position.y = 500
         this.rollOverMaterial = new THREE.MeshBasicMaterial({
             color: 0xff0000,
             opacity: 0.5,
