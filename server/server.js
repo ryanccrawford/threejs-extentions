@@ -13,19 +13,17 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
 
-class User extends Model {}
-User.init({
+class Part extends Model {}
+Part.init({
     // attributes
-    firstName: {
+    FBXfile: {
         type: Sequelize.STRING,
         allowNull: false
     },
-    lastName: {
+    name: {
         type: Sequelize.STRING
-            // allowNull defaults to true
     }
 }, {
     sequelize,
-    modelName: 'user'
-        // options
+    modelName: 'part'
 });
