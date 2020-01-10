@@ -10,20 +10,3 @@ const sequelize = new Sequelize('database', 'username', 'password', {
 app.get("/", (req, res) => res.send("Hello World!"));
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-
-
-
-class Part extends Model {}
-Part.init({
-    // attributes
-    FBXfile: {
-        type: Sequelize.STRING,
-        allowNull: false
-    },
-    name: {
-        type: Sequelize.STRING
-    }
-}, {
-    sequelize,
-    modelName: 'part'
-});
