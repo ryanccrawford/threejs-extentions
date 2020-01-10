@@ -13,7 +13,6 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
 
-<<<<<<< HEAD
 class Part extends Model {}
 Part.init({
     // attributes
@@ -27,21 +26,4 @@ Part.init({
 }, {
     sequelize,
     modelName: 'part'
-=======
-class User extends Model {}
-User.init({
-    // attributes
-    firstName: {
-        type: Sequelize.STRING,
-        allowNull: false
-    },
-    lastName: {
-        type: Sequelize.STRING
-            // allowNull defaults to true
-    }
-}, {
-    sequelize,
-    modelName: 'user'
-        // options
->>>>>>> f86f6d4... update
 });
