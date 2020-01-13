@@ -4,12 +4,12 @@ const port = 3000;
 const { Sequelize, Model, DataTypes } = require("sequelize");
 const sequelize = new Sequelize('database', 'username', 'password', {
     host: 'localhost',
-    dialect: /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */
+    dialect:  'mysql',
 });
 
 app.get("/", (req, res) => res.send("Hello World!"));
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`API Server started on port ${port}!`));
 
 class Part extends Model {}
 Part.init({
