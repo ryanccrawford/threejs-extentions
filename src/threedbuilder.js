@@ -41,15 +41,11 @@ class thebuilder {
         this.height = 600;
         this.width = width;
         this.appendToElement = appendToElement;
-        this.camera = new THREE.PerspectiveCamera(
-            20,
-            this.width / 600,
-            1,
-            10000
-        );
+        this.camera = new THREE.PerspectiveCamera(20, this.width / 600, 1, 10000);
         this.camera.position.z = 500;
         this.camera.position.x = 500;
-        this.camera.position.y = 500
+        this.camera.position.y = 500;
+        this.camera.lookAt(0, 0, 0);
         this.rollOverMaterial = new THREE.MeshBasicMaterial({
             color: 0xff0000,
             opacity: 0.5,
@@ -76,7 +72,6 @@ class thebuilder {
         });
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.setSize(this.width, 600);
-
     }
 
     attach = () => {
@@ -84,10 +79,9 @@ class thebuilder {
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
 
-        this.renderer.domElement.addEventListener(
-            'keyup keydown',
-            this.keyUpDown
-        );
+        this.renderer.domElement.addEventListener("keydown", this.keyDown);
+
+        this.renderer.domElement.addEventListener("keyup", this.keyUp);
 
         this.renderer.domElement.addEventListener(
             "mousemove",
@@ -133,8 +127,6 @@ class thebuilder {
         this.dragControls.addEventListener("dragend", this.onDragEnd);
         this.dragControls.enabled = false;
 
-
-
         // Prepare clock
         this.clock = new THREE.Clock();
         this.controls.update(this.clock.getDelta());
@@ -147,9 +139,13 @@ class thebuilder {
         this.render();
     };
 
-
     updateMousePosition = () => {
-        const newMouseDisplay = this.components.mousePosition(this.mouse.x, this.mouse.y, 0, "mouse");
+        const newMouseDisplay = this.components.mousePosition(
+            this.mouse.x,
+            this.mouse.y,
+            0,
+            "mouse"
+        );
         this.components.replaceElement("mouse", newMouseDisplay);
     };
 
@@ -158,23 +154,33 @@ class thebuilder {
     };
 
     update = () => {
-
         this.updateMousePosition();
         if (this.controls.enabled) {
             const delta = this.clock.getDelta();
             this.controls.update(delta);
-
         }
         this.camera.updateProjectionMatrix();
         //this.dragControls.update();
     };
-    keyUpDown = (e) => {
-        this.isShiftDown = e.shiftKey
-    }
-    onKey = (event) => {
+    keyDown = e => {
+        switch (e.key) {
+            case 37:
+                this.camera.position.set.y(this.camera.position.y + 1)
+                break;
+            case 39:
+                this.camera.position.set.y(this.camera.position.y - 1);
+                break;
+            default:
+                this.stopCameraMove()
+        }
+    };
 
-        console.log("keyPressed")
-        console.log(event.key)
+    keyUp = e => {
+        this.isShiftDown = e.shiftKey;
+    };
+    onKey = event => {
+        console.log("keyPressed");
+        console.log(event.key);
 
         switch (event.key) {
             case "R":
@@ -191,10 +197,9 @@ class thebuilder {
                 //this.insertPart();
                 break;
         }
-    }
+    };
 
-    onDragStart = (event) => {
-
+    onDragStart = event => {
         if (this.controls.enableRotate) {
             return;
         }
@@ -203,8 +208,7 @@ class thebuilder {
         }
         event.object.material.emissive.set(0xaaaaaa);
     };
-    onDragEnd = (event) => {
-
+    onDragEnd = event => {
         if (event.object.material.emissive === undefined) {
             return;
         }
@@ -226,9 +230,7 @@ class thebuilder {
         const x = (event.clientX / window.innerWidth) * 2 - 1;
         const y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        this.mouse.set(
-            x, y
-        );
+        this.mouse.set(x, y);
         if (!this.rollOverLoaded) {
             return;
         }
@@ -251,13 +253,10 @@ class thebuilder {
                 .multiplyScalar(50)
                 .addScalar(50);
         }
-
-
     };
 
     onRolloverLoad = () => {
-
-        let gridSize = 1000
+        let gridSize = 1000;
         const gridDividers = 50;
         this.gridHelper = new THREE.GridHelper(
             gridSize,
@@ -299,11 +298,9 @@ class thebuilder {
                 .multiplyScalar(50)
                 .addScalar(50);
         }
-
-
     };
     onVoxelLoad = () => {
-        const voxel = this.newParts.pop()
+        const voxel = this.newParts.pop();
         this.raycaster.setFromCamera(this.mouse, this.camera);
         const intersects = this.raycaster.intersectObjects(this.objects);
         if (intersects.length > 0) {
@@ -315,13 +312,13 @@ class thebuilder {
                     this.objects.splice(this.objects.indexOf(intersect.object), 1);
                 }
             } else {
-
-                voxel.position()
+                voxel
+                    .position()
                     .copy(intersect.point)
                     .add(intersect.face.normal);
 
-
-                voxel.position()
+                voxel
+                    .position()
                     .divideScalar(50)
                     .floor()
                     .multiplyScalar(50)
@@ -338,9 +335,7 @@ class thebuilder {
         const x = (event.clientX / window.innerWidth) * 2 - 1;
         const y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        this.mouse.set(
-            x, y
-        );
+        this.mouse.set(x, y);
         if (!this.rollOverLoaded) {
             return;
         }
@@ -357,8 +352,6 @@ class thebuilder {
             this.newParts.push(newPart);
             newPart.getPart();
         }
-
-
     };
 }
 
