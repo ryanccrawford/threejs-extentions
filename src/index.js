@@ -2,6 +2,7 @@ import _ from "lodash";
 import "bootstrap/dist/css/bootstrap.css";
 import $ from "jquery";
 import "bootstrap";
+import { APIData } from "./databasinterface.js";
 import printMe from "./print.js";
 import components from "./components.js";
 import thebuilder from "./threedbuilder.js";
@@ -19,13 +20,9 @@ function topContainer() {
 }
 function titleBar(){
     const Components = new components();
-    const btn = document.createElement("button");
-    btn.innerHTML = "More Info";
-    btn.onclick = printMe;
     const jumbo = Components.jumbotron();
     const text = Components.display4('3 Star - 3D Tower Builder');
     jumbo.appendChild(text);
-    jumbo.appendChild(btn);
     return jumbo;
 }
  function bottomContainer(){
@@ -68,22 +65,39 @@ function makeToolBar(buttonIcons){
     return toolbar.getElement();
 }
 
-const onRotateClick = (event) => {
-    event.preventDefault();
-    console.log("rotateClicked");
-}
-const onPanClick = (event) => {
-    event.preventDefault();
-    console.log("Pan Clicked");
-}
-const onSelectClick = (event) => {
-    event.preventDefault();
-    console.log("Select Clicked");
+function makeSelectBox(id, name, label, options, onSelectionEvent){
+    const Components = new components();
+    const selectBox = Components.selectBox(id, name, label, options, onSelectionEvent)
+
+
 }
 
-const rotateButton = makeRadioButton("rotate","rotate", "Rotate", '','', onRotateClick, true, true);
-const panButton = makeRadioButton("pan","pan", "Pan", '','', onPanClick, true, true);
-const selectButton = makeRadioButton("select","select", "Select", '','', onSelectClick, true, true);
+const onStart = event => {
+    event.preventDefault();
+    const itemSelected = event.target.itemSelected;
+    console.log(itemSelected.name);
+}
+const onToolButtonClick = (event) => {
+    event.preventDefault();
+    const buttonClicked = event.target;
+    console.log(buttonClicked.name);
+}
+
+var seiresSelectBox,seiresOptions;
+
+const database = new APIData();
+
+const onDataRetured = data => {
+    console.log(data)
+    let items = {text: "25G", id: "0"} 
+    seiresSelectBox = makeSelectBox("seires", "seires", "Select Tower Seires", items, onStart);
+}
+
+database.getData("getSeiresOptions", onDataRetured, onDataRetured);
+
+const rotateButton = makeRadioButton("rotate","rotate", "Rotate", '','', onToolButtonClick, true, true);
+const panButton = makeRadioButton("pan","pan", "Pan", '','', onToolButtonClick, true, true);
+const selectButton = makeRadioButton("select","select", "Select", '','', onToolButtonClick, true, true);
 const icons = [rotateButton,panButton,selectButton];
 const bar = makeToolBar(icons);
 

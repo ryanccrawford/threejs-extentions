@@ -13,7 +13,7 @@ class ToolIcon {
     name;
     active;
 
-    constructor( buttonId, image, hoverImage, text, name, onClick, order = 0, mesh = null, active = false ){
+    constructor( buttonId, image, hoverImage, text, name, onClick, order = 0, mesh = null, active = false){
         this.components = new components()
         this.elementId = buttonId;
         this.onClick = onClick;
@@ -33,10 +33,21 @@ class ToolIcon {
 
     buildElement = () => {
         
-        const toggleButton = this.components.button(this.elementId, this.text, this.name, 'radio', "primary", this.onClick);
-        toggleButton.setAttribute("active", this.active);
-        console.log(toggleButton);
-        return toggleButton;
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        label.classList = "btn btn-primary" ;
+        input.setAttribute("type", "radio");
+        input.name = this.name;
+        input.id = this.elementId;
+        label.textContent = this.text;
+        if(this.active){
+            input.checked = true;
+            label.classList += " active";
+        }else{
+            input.checked = false;
+        }
+        label.appendChild(input);
+        return label;
     }
 
 }

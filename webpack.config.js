@@ -18,7 +18,7 @@ module.exports = {
         RolloverPart: "./src/rolloverpart.js",
         TowerSection: "./src/towersection.js",
         thebuilder: "./src/threedbuilder.js",
-        
+        APIData: "./src/databaseinterface.js",
     },
     devtool: "inline-source-map",
     devServer: {

@@ -21,8 +21,10 @@ class ToolBar {
     }
 
     buildToolBar = () => {
-        const toolBar = this.components.buttonToggleGroup(this.toolIcons,"primary")
-        return toolBar;
+        const toolBar = this.components.buttonToggleGroup(this.toolIcons,"");
+        toolBar.setAttribute("data-toggle", "buttons" )
+        const card = this.components.card(toolBar.outerHTML, "Tools", "");
+        return card;
     }
 }
 

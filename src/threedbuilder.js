@@ -107,29 +107,9 @@ class thebuilder {
 
         this.rollOverObject = new RolloverPart(rollOverOptions);
         this.rollOverObject.getPart();
-        // Prepare Orbit controls
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        //this.controls.target = new THREE.Vector3(0, 0, 0);
-        this.controls.maxDistance = 2000;
-        this.controls.enableRotate = false;
-        this.controls.enablePan = true;
-        this.controls.enableZoom = true;
-        this.controls.enableKeys = false;
-        this.controls.enableDamping = true;
-        this.controls.dampingFactor = 0.2;
-        this.dragControls = new DragControls(
-            this.objects,
-            this.camera,
-            this.renderer.domElement
-        );
-        this.dragControls.addEventListener("dragstart", this.onDragStart);
-
-        this.dragControls.addEventListener("dragend", this.onDragEnd);
-        this.dragControls.enabled = false;
-
-        // Prepare clock
+        
         this.clock = new THREE.Clock();
-        this.controls.update(this.clock.getDelta());
+        //this.controls.update(this.clock.getDelta());
         this.render();
         this.animate();
     };
@@ -155,10 +135,10 @@ class thebuilder {
 
     update = () => {
         this.updateMousePosition();
-        if (this.controls.enabled) {
-            const delta = this.clock.getDelta();
-            this.controls.update(delta);
-        }
+        // if (this.controls.enabled) {
+        //     const delta = this.clock.getDelta();
+        //     this.controls.update(delta);
+        // }
         this.camera.updateProjectionMatrix();
         //this.dragControls.update();
     };
@@ -227,8 +207,8 @@ class thebuilder {
 
     onDocumentMouseMove = event => {
         event.preventDefault();
-        const x = (event.clientX / window.innerWidth) * 2 - 1;
-        const y = -(event.clientY / window.innerHeight) * 2 + 1;
+        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.50;
+        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.50;
 
         this.mouse.set(x, y);
         if (!this.rollOverLoaded) {
@@ -332,8 +312,8 @@ class thebuilder {
     onDocumentMouseDown = event => {
         event.preventDefault();
 
-        const x = (event.clientX / window.innerWidth) * 2 - 1;
-        const y = -(event.clientY / window.innerHeight) * 2 + 1;
+        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.50;
+        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.50;
 
         this.mouse.set(x, y);
         if (!this.rollOverLoaded) {

@@ -1,4 +1,4 @@
-import axios from "axios"
+import Axios from "axios"
 
 
 class Parts {
@@ -50,5 +50,15 @@ class APIData {
         return this.endPointBase + this.endPointGet + call;
     }
 
+    getData = (what, successfullCallback, failCallback) => {
+        let endPoint = this.buildEndPoint(what);
+        Axios.get(endPoint).then(
+            (data) => successfullCallback(data),
+            (error) => failCallback(error)
+        )
+    }
+
 
 }
+
+export {APIData, PartLoader, Parts}

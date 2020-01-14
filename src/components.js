@@ -21,10 +21,13 @@ class components {
         return display;
     }
 
-    button = (id, text, name, type = "button", color = "primary" , onClick, className = false) => {
+    button = (id, text, name, type = "button", color = "primary" , onClick, className = false, isBarButton = false) => {
            const button = document.createElement("button");
         if(className){
            button.className = "btn btn-" + color;
+        }
+        if(isBarButton){
+            button.className = button.className + " btn-bar"
         }
         button.setAttribute("id", id);
         button.setAttribute("name", name);
@@ -140,19 +143,11 @@ class components {
     }
 
     buttonToggleGroup = (radioButtons = [], color = "primary") => {
-        const buttonGroup = this.div("btn-group btn-group-toggle")
-       // buttonGroup.setAttribute("data-toggle", "buttons")
-        
+        const buttonGroup = this.div("btn-group-vertical btn-group-toggle")
+       
         radioButtons.forEach(item => {
-            const label = this.c("label")
-            console.log(item)
-            let active = "";
-            if(item.getAttribute("active")){
-                active = " active";
-            }
-            label.className = "btn btn-" + color + active;
-            label.appendChild(item);
-            buttonGroup.appendChild(label);
+        
+            buttonGroup.appendChild(item);
         })
 
         return buttonGroup;
