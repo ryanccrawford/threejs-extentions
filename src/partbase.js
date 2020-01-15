@@ -51,7 +51,7 @@ class PartBase {
         if (!self.meshInMemory) {
 
             this.loader.load(this.importFile, function(object) {
-                object.rotateX(THREE.Math.degToRad(-90));
+                //object.rotateX(THREE.Math.degToRad(-90));
                 object.traverse(function(child) {
                     if (child.isMesh) {
                         child.castShadow = true;

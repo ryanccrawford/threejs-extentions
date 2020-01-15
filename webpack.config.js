@@ -19,6 +19,9 @@ module.exports = {
         Mpn25g: "./src/mpn25g.js",
         thebuilder: "./src/threedbuilder.js",
         APIData: "./src/databaseinterface.js",
+        Mpn25ag5: "./src/mpn25ag5.js",
+        MpnSb25g5: "./src/mpnsb25g5.js",
+        Materials: "./src/materials.js"
     },
     devtool: "inline-source-map",
     devServer: {

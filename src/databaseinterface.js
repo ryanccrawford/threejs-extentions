@@ -16,11 +16,12 @@ class APIData {
     }
 
     getData = (what, successfullCallback, failCallback) => {
-        let endPoint = this.buildEndPoint(what);
-        Axios.get(endPoint).then(
-            (data) => successfullCallback(data),
-            (error) => failCallback(error)
-        )
+        successfullCallback()
+        // let endPoint = this.buildEndPoint(what);
+        // Axios.get(endPoint).then(
+        //     (data) => successfullCallback(data),
+        //     (error) => failCallback(error)
+        // )
     }
 
 
