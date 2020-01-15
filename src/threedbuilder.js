@@ -2,10 +2,10 @@ import * as THREE from 'three';
 //import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 //import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { PartOptions } from "./partbase.js";
-import { Mpn25g } from "./mpn25g.js";
+import Mpn25g from "./mpn25g.js";
 import { RolloverPart } from "./rolloverpart.js";
 import components from "./components.js";
-
+import Materials from "./materials.js";
 
 class thebuilder {
     scene;
@@ -42,7 +42,7 @@ class thebuilder {
         this.appendToElement = appendToElement;
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-
+        this.rollOverMaterial = new Materials().RollOver;
         this.createCamera();
     }
     createCamera = () => {
@@ -141,9 +141,9 @@ class thebuilder {
         let rollOverOptions = new PartOptions();
 
         rollOverOptions.material = this.rollOverMaterial;
-        rollOverOptions.materialType = "MeshBasicMaterial";
-        rollOverOptions.name = " Rollover Part";
-        rollOverOptions.importFile = "assets/3dmodels/25g.fbx";
+       
+        rollOverOptions.name = "Rollover Part";
+        rollOverOptions.importFile = "assets/3dmodels/25G.fbx";
         rollOverOptions.readyCallback = this.onRolloverLoad.bind(this);
 
         this.rollOverObject = new RolloverPart(rollOverOptions);

@@ -2,7 +2,8 @@ import _ from "lodash";
 import "bootstrap/dist/css/bootstrap.css";
 import $ from "jquery";
 import "bootstrap";
-import { APIData } from "./databasinterface.js";
+import Axios from "axios"
+import APIData from "./databaseinterface.js";
 import printMe from "./print.js";
 import components from "./components.js";
 import thebuilder from "./threedbuilder.js";

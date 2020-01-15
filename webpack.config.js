@@ -16,7 +16,7 @@ module.exports = {
         PartOptions: "./src/partbase.js",
         PartBase: "./src/partbase.js",
         RolloverPart: "./src/rolloverpart.js",
-        TowerSection: "./src/towersection.js",
+        Mpn25g: "./src/mpn25g.js",
         thebuilder: "./src/threedbuilder.js",
         APIData: "./src/databaseinterface.js",
     },
@@ -35,7 +35,7 @@ module.exports = {
             headHtmlSnippet: "<style>div.app-spinner {position: fixed;top:50%;left:50%;}</style >",
             bodyHtmlSnippet: "<div id='threed'></div>",
             //baseHref: "https://tower-builder.herokuapp.com/",
-            devServer: "https://3stb",
+            devServer: "http://localhost:8080",
             meta: [{
                 name: "description",
                 content: "3 Star Inc. 3D Tower Builder"
