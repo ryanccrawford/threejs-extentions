@@ -124,14 +124,57 @@ function makeSelectBox(id, name, label, onSelectionEvent){
     return Components.selectBox(id, name, label, onSelectionEvent) 
 }
 
+
 const thisTower = new tower();
+const showHeightSelection = (box) => {
+    towerSelect.getElementsByClassName("card-body")[0].appendChild(box)
+}
+
+const getHeightOption = () => {
+    //TODO: Check to see which heights are avalible
+    let dataHeights = ["10","20","30","40","50","60"];
+    let returnH = []
+    let count = -1;
+    for(let i = 0; i< dataHeights.length; i++){
+
+        returnH.push({name: dataHeights[i], id: ++count, isSelected: count === 0 ? true : false});
+    }
+    return returnH
+}
+
 const onStart = event => {
     event.preventDefault();
     const itemSelected = event.target.selectedOptions[event.target.selectedIndex];
     console.log(itemSelected.textContent);
     thisTower.setModel(itemSelected.textContent);
+    const heightOptions = getHeightOption()
+   
+    let label = "Select Tower Height"
+   const heightSelectBox = makeSelectBox("height", "height", "Select Height of Tower", onHeightSelect);
+  
+   for(let i = 0; i< heightOptions.length; i++){
+       const opt = document.createElement("option");
+       const textNode = document.createTextNode(heightOptions[i].name)
+       opt.appendChild(textNode);
+       opt.value = heightOptions[i].id.toString()
+       opt.selected = heightOptions[i].isSelected;
+       heightSelectBox.appendChild(opt);
+   }
+    showHeightSelection(heightSelectBox);
 
 }
+
+
+
+
+const onHeightSelect = event => {
+    event.preventDefault();
+    const itemSelected = parseInt(event.target.selectedOptions[0].text);
+    thisTower.setHeight(itemSelected);
+    
+
+}
+
 const onToolButtonClick = (event) => {
     event.preventDefault();
     const buttonClicked = event.target;
@@ -165,6 +208,12 @@ const onDataRetured = data => {
         opt.selected = seiresOptions[i].isSelected;
         seiresSelectBox.appendChild(opt);
     }
+
+
+
+
+
+
     doneCreatingOptions();
    
 }
