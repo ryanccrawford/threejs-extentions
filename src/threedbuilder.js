@@ -1,18 +1,27 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import TowerSection from 'towersection.js'
+//import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+//import { DragControls } from "three/examples/jsm/controls/DragControls.js";
+import { PartOptions } from "./partbase.js";
+import { Mpn25g } from "./mpn25g.js";
+import { RolloverPart } from "./rolloverpart.js";
+import components from "./components.js";
+
 
 class thebuilder {
     scene;
     camera;
     controls;
+    dragControls;
     renderer;
     objects = [];
     raycaster;
     rollOverMesh;
+    rollOverObject;
+    rollOverMaterial;
     gridHelper;
     partGeo;
     partMaterial;
+    chromeMaterial;
     appendToElement;
     mouse;
     height;
@@ -20,9 +29,15 @@ class thebuilder {
     isShiftDown = false;
     partLoaded = false;
     rollOverLoaded = false;
+    components;
+    mouseDisplay;
+    canvas;
+    prevMousePosition;
+    newParts = [];
 
     constructor(height = 500, width = 800, appendToElement = "") {
-        this.height = height;
+        this.components = new components();
+        this.height = 600;
         this.width = width;
         this.appendToElement = appendToElement;
         this.raycaster = new THREE.Raycaster();
@@ -94,137 +109,121 @@ class thebuilder {
          this.renderer.setSize(this.width, this.height);
 
      }
-
-
-
-
     attach = () => {
         document
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
         
         this.addEventListeners();
-
-        this.fbxLoader("assets/3dmodels/25g.fbx", this.onRolloverLoad);
-
-        // Prepare Orbit controls
-        // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        // this.controls.target = new THREE.Vector3(0, 0, 0);
-        // this.controls.maxDistance = 5000;
-
-        // Prepare clock
+        this.createRollOver();
+       
         this.clock = new THREE.Clock();
 
         this.animate();
-    };
+    }
+
     addEventListeners = () => {
 
         this.renderer.domElement.addEventListener(
             "mousemove",
-            this.onDocumentMouseMove,
-            false
-        );
+            this.onDocumentMouseMove
+        )
+
+        window.addEventListener("resize", this.onResize);
 
         this.renderer.domElement.addEventListener(
             "mousedown",
-            this.onDocumentMouseDown,
-            false
+            this.onDocumentMouseDown
         );
     }
 
+    createRollOver = () => {
+        let rollOverOptions = new PartOptions();
+
+        rollOverOptions.material = this.rollOverMaterial;
+        rollOverOptions.materialType = "MeshBasicMaterial";
+        rollOverOptions.name = " Rollover Part";
+        rollOverOptions.importFile = "assets/3dmodels/25g.fbx";
+        rollOverOptions.readyCallback = this.onRolloverLoad.bind(this);
+
+        this.rollOverObject = new RolloverPart(rollOverOptions);
+        this.rollOverObject.getPart();
+    }
+    
     animate = () => {
         requestAnimationFrame(this.animate);
-        this.render();
         this.update();
+        this.render();
+    };
+
+    updateMousePosition = () => {
+        const newMouseDisplay = this.components.mousePosition(
+            this.mouse.x,
+            this.mouse.y,
+            0,
+            "mouse"
+        );
+        this.components.replaceElement("mouse", newMouseDisplay);
     };
 
     render = () => {
         this.renderer.render(this.scene, this.camera);
-    };
+    }
+
     update = () => {
-        let delta = this.clock.getDelta();
+        this.updateMousePosition();
+        this.camera.updateProjectionMatrix();
+     }
 
-        this.controls.update(delta);
-    };
+    onResize = event => {
+        event.preventDefault();
+        const canvas = document.getElementsByTagName("canvas")[0];
+        const div = document.getElementById("renderarea");
+        this.width = div.clientWidth;
+        this.camera.aspect = this.width / 600;
+        canvas.width = this.width;
+        this.renderer.setSize(this.width, 600);
+        this.camera.updateProjectionMatrix();
+    }
 
-   
     onDocumentMouseMove = event => {
         event.preventDefault();
-        if (!this.partLoaded || !this.rollOverLoaded) {
+        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.50;
+
+        this.mouse.set(x, y);
+        if (!this.rollOverLoaded) {
             return;
         }
-        this.mouse.set(
-            (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
-        );
-
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
-        var intersects = this.raycaster.intersectObjects(this.objects);
+        const intersects = this.raycaster.intersectObjects(this.objects);
 
         if (intersects.length > 0) {
-            var intersect = intersects[0];
+            const intersect = intersects[0];
 
-            this.rollOverMesh.position
+            this.rollOverObject
+                .position()
                 .copy(intersect.point)
                 .add(intersect.face.normal);
-            this.rollOverMesh.position
-                .divideScalar(this.rollOverMesh.height)
+
+            this.rollOverObject
+                .position()
+                .divideScalar(50)
                 .floor()
-                .multiplyScalar(this.rollOverMesh.width)
-                .addScalar(this.rollOverMesh.height / 2);
+                .multiplyScalar(50)
+                .addScalar(50);
         }
     };
 
-    fbxLoader = (path, callback) => {
-        const loader = new FBXLoader();
-
-        let binder = this;
-        loader.load(path, function(object) {
-            
-            object.traverse(function(child) {
-                if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-                    child.MeshLambertMaterial = binder.partMaterial;
-                }
-            });
-
-            callback(object);
-
-        });
-
-
-    };
-
-    onPartLoad = (part) => {
-        this.partLoaded = true;
+    onRolloverLoad = () => {
+        
+        this.scene.add(this.rollOverObject.partMesh);
+        this.rollOverLoaded = true;   
     }
-    onRolloverLoad = (rollover) => {
-        this.rollOverMaterial = new THREE.MeshBasicMaterial({
-            color: 0xff0000,
-            opacity: 0.5,
-            transparent: true
-        });
-        this.rollOverMesh = rollover;
-        let binder = this;
+    onVoxelLoad = () => {
 
-        this.rollOverMesh.traverse(function(child) {
-            if (child.isMesh) {
-                child.castShadow = false;
-                child.receiveShadow = false;
-                child.MeshBasicMaterial = binder.rollOverMaterial;
-            }
-        });
-
-        this.scene.add(this.rollOverMesh);
-        this.rollOverLoaded = true;
-
-    }
-
-    onVoxelLoad = (voxel) => {
-
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-        let intersects = this.raycaster.intersectObjects(this.objects);
+        const voxel = this.newParts.pop();
+        const intersects = this.raycaster.intersectObjects(this.objects);
         if (intersects.length > 0) {
             var intersect = intersects[0];
             if (this.isShiftDown) {
@@ -233,37 +232,45 @@ class thebuilder {
 
                     this.objects.splice(this.objects.indexOf(intersect.object), 1);
                 }
-
-                // create cube
             } else {
-                voxel.position.copy(intersect.point).add(intersect.face.normal);
-                voxel.position
-                    .divideScalar(voxel.width)
-                    .floor()
-                    .multiplyScalar(voxel.height)
-                    .addScalar(voxel.height / 2);
-                this.scene.add(voxel);
+                voxel
+                    .position()
+                    .copy(intersect.point)
+                    .add(intersect.face.normal);
 
-                this.objects.push(voxel);
+                voxel
+                    .position()
+                    .divideScalar(50)
+                    .floor()
+                    .multiplyScalar(50)
+                    .addScalar(50);
+                this.scene.add(voxel.partMesh);
+                this.objects.push(voxel.partMesh);
             }
         }
-    }
+    };
 
     onDocumentMouseDown = event => {
         event.preventDefault();
-        if (!this.partLoaded || !this.rollOverLoaded) {
+
+        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.50;
+        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.50;
+
+        this.mouse.set(x, y);
+        if (!this.rollOverLoaded) {
             return;
         }
-        this.mouse.set(
-            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
-        );
 
         this.raycaster.setFromCamera(this.mouse, this.camera);
 
-        let intersects = this.raycaster.intersectObjects(this.objects);
+        const intersects = this.raycaster.intersectObjects(this.objects);
 
         if (intersects.length > 0) {
-            this.fbxLoader("assets/3dmodels/25g.fbx", this.onVoxelLoad);
+            let newOptions = new PartOptions();
+            newOptions.readyCallback = this.onVoxelLoad.bind(this);
+            let newPart = new Mpn25g(newOptions);
+            this.newParts.push(newPart);
+            newPart.getPart();
         }
     };
 }

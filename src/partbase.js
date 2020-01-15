@@ -2,68 +2,123 @@ import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 class PartBase {
-    
-    static id = -1;
-    
-    name = '';
-    importFile = '';
-    partMesh = null;
-    loader = new FBXLoader();
-    material = null;
-    height = null;
-    width = null;
-    position = null;
+    static meshInMemory;
+    name = "";
+    importFile = "";
+    partMesh;
+    loader;
+    material;
+    materialType;
+    height;
+    width;
+    size;
     isImportComplete = false;
+    readyCallback;
 
     constructor(options = new PartOptions()) {
-        self.id++;
         this.name = options.name;
         this.material = options.material;
         this.importFile = options.importFile;
+        this.readyCallback = options.readyCallback;
+        this.materialType = options.materialType;
+        this.loader = new FBXLoader();
+    }
+
+    getPart = () => {
         if (this.importFile) {
-            this.fileImporter(this.importComplete);
+            console.log("Importing Part: Function getPart() was called");
+            this.fileImporter();
         }
+    };
 
-    }
+    importComplete = part => {
 
-    importComplete = (part) => {
-        this.height = part.height;
-        this.width = part.width;
-        this.position = part.position;
         this.partMesh = part;
+        this.height = this.getHeight();
+        this.width = this.getWidth();
+        this.length = this.getLength();
         this.isImportComplete = true;
-    }
+        this.readyCallback(part);
+    };
 
-    fileImporter = (callback) => {
-        if (!this.importFile || this.isImportComplete) {
-            return;
+    position = () => {
+        if (this.isImportComplete) {
+            return this.partMesh.position;
         }
-        let binder = this;
-        this.loader.load(this.importFile, function(object) {
-            object.traverse(function(child) {
+    }
+    fileImporter = () => {
+        const binder = this;
+        if (!self.meshInMemory) {
+
+            this.loader.load(this.importFile, function(object) {
+                object.rotateX(THREE.Math.degToRad(-90));
+                object.traverse(function(child) {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                        child.material = binder.material;
+                    }
+                });
+                self.meshInMemory = object;
+                binder.importComplete(object);
+            });
+        } else {
+            const mesh = this.clone();
+            mesh.traverse(function(child) {
                 if (child.isMesh) {
                     child.castShadow = true;
                     child.receiveShadow = true;
-                    child.MeshLambertMaterial = binder.material;
+                    child.material = binder.material;
                 }
             });
-            
-            callback(object);
-        });
+
+            binder.importComplete(mesh)
+        }
+    };
+
+    getHeight = () => {
+        console.log("height: ");
+        const height = this.getSize().y;
+        console.log(height);
+        return height;
+    };
+
+    getWidth = () => {
+        console.log("width: ");
+        const width = this.getSize().x;
+        console.log(width);
+        return width;
+    };
+
+    getLength = () => {
+        console.log("length: ");
+        const length = this.getSize().z;
+        console.log(length);
+        return length;
+    };
+
+    getSize = () => {
+        if (!this.size) {
+            this.size = new THREE.Vector3();
+        }
+        const box = new THREE.Box3().setFromObject(this.partMesh);
+        return box.getSize(this.size);
     };
 
     clone = () => {
-        if (!this.isImportComplete) {
-            return;
-        }
-        return this.partMesh.clone(true);
-    }
+        return self.meshInMemory.clone(true);
+    };
 }
 
 class PartOptions {
     name;
     material;
     importFile;
+    readyCallback;
+    materialType;
 }
 
-export default PartBase;
+export {
+    PartBase,
+    PartOptions
+};

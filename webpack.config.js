@@ -1,4 +1,6 @@
 const path = require("path");
+const webpack = require('webpack');
+const nodeExternals = require('webpack-node-externals');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
@@ -8,17 +10,22 @@ module.exports = {
     entry: {
         app: "./src/index.js",
         print: "./src/print.js",
-        container: "./src/container.js",
-        thebuilder: "./src/threedbuilder.js"
+        components: "./src/components.js",
+        ToolIcon: "./src/toolicon.js",
+        ToolBar: "./src/toolbar.js",
+        PartOptions: "./src/partbase.js",
+        PartBase: "./src/partbase.js",
+        RolloverPart: "./src/rolloverpart.js",
+        TowerSection: "./src/towersection.js",
+        thebuilder: "./src/threedbuilder.js",
+        APIData: "./src/databaseinterface.js",
     },
     devtool: "inline-source-map",
     devServer: {
         contentBase: "./dist"
     },
     plugins: [
-        new CopyPlugin([
-            { from: './src/assets', to: './assets' },
-        ]),
+        new CopyPlugin([{ from: "./src/assets", to: "./assets" }]),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             inject: false,
@@ -27,8 +34,8 @@ module.exports = {
             appMountHtmlSnippet: '<div class="app-spinner"><i class="fa fa-spinner fa-spin fa-5x" aria-hidden="true"></i></div>',
             headHtmlSnippet: "<style>div.app-spinner {position: fixed;top:50%;left:50%;}</style >",
             bodyHtmlSnippet: "<div id='threed'></div>",
-            baseHref: "https://3dtb",
-            // devServer: "https://3dtb",
+            //baseHref: "https://tower-builder.herokuapp.com/",
+            devServer: "https://3stb",
             meta: [{
                 name: "description",
                 content: "3 Star Inc. 3D Tower Builder"
@@ -60,7 +67,7 @@ module.exports = {
             title: "3 Star Inc. 3D Tower Builder",
             window: {
                 env: {
-                    apiHost: "https://3dtb/api"
+                    apiHost: "https://tower-builder.herokuapp.com//api"
                 }
             }
         })
