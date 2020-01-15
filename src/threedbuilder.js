@@ -7,7 +7,6 @@ class thebuilder {
     camera;
     controls;
     renderer;
-    lights = [];
     objects = [];
     raycaster;
     rollOverMesh;
@@ -26,6 +25,12 @@ class thebuilder {
         this.height = height;
         this.width = width;
         this.appendToElement = appendToElement;
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
+
+        this.createCamera();
+    }
+    createCamera = () => {
         this.camera = new THREE.PerspectiveCamera(
             45,
             this.width / this.height,
@@ -34,57 +39,86 @@ class thebuilder {
         );
         this.camera.position.set(500, 800, 1300);
         this.camera.lookAt(0, 0, 0);
-        this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0xf0f0f0);
-
-        this.gridHelper = new THREE.GridHelper(1000, 20);
+        this.eventCameraReady();
+    }
+    eventCameraReady = () => {
+        this.createScene()
+    }
+    createScene = () => {
+         this.scene = new THREE.Scene();
+         this.scene.background = new THREE.Color(0xf0f0f0);
+        this.eventSceneReady();
+    }
+    eventSceneReady = () => {
+        this.createFloor();
+    }
+    createFloor = () => {
+        
+        const gridHelper = new THREE.GridHelper(1000, 20);
         this.scene.add(this.gridHelper);
 
-        this.raycaster = new THREE.Raycaster();
-        this.mouse = new THREE.Vector2();
-
-        let geometry = new THREE.PlaneBufferGeometry(1000, 1000);
+        const geometry = new THREE.PlaneBufferGeometry(1000, 1000);
         geometry.rotateX(-Math.PI / 2);
 
-        this.plane = new THREE.Mesh(
+        const plane = new THREE.Mesh(
             geometry,
             new THREE.MeshBasicMaterial({
                 visible: false
             })
         );
-        this.scene.add(this.plane);
+        this.scene.add(plane);
+        this.objects.push(plane);
 
-        this.objects.push(this.plane);
-
-        // lights
-
-        let ambientLight = new THREE.AmbientLight(0x606060);
+        this.eventFloorReady();
+    }
+    eventFloorReady = () => { 
+        this.createLights();
+    }
+    createLights = () => {
+        const ambientLight = new THREE.AmbientLight(0x606060);
         this.scene.add(ambientLight);
-        this.lights.push(ambientLight);
-        let directionalLight = new THREE.DirectionalLight(0xffffff);
+       
+        const directionalLight = new THREE.DirectionalLight(0xffffff);
         directionalLight.position.set(1, 0.75, 0.5).normalize();
         this.scene.add(directionalLight);
-        this.lights.push(directionalLight);
-        this.renderer = new THREE.WebGLRenderer({
-            antialias: true
-        });
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.setSize(width, height);
+        this.eventLightsReady();
     }
+    eventLightsReady = () => {
+        this.createRenderer();
+    }
+    createRenderer = () => {
+         this.renderer = new THREE.WebGLRenderer({
+             antialias: true
+         });
+         this.renderer.setPixelRatio(window.devicePixelRatio);
+         this.renderer.setSize(this.width, this.height);
+
+     }
+
+
+
 
     attach = () => {
         document
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
-        this.isMouseOver = false;
-        this.renderer.domElement.addEventListener(
-            "mouseover",
-            this.onDocumentMouseEnter
-        );
-        this.renderer.domElement.addEventListener(
-            "mouseout",
-            this.onDocumentMouseOut
-        );
+        
+        this.addEventListeners();
+
+        this.fbxLoader("assets/3dmodels/25g.fbx", this.onRolloverLoad);
+
+        // Prepare Orbit controls
+        // this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        // this.controls.target = new THREE.Vector3(0, 0, 0);
+        // this.controls.maxDistance = 5000;
+
+        // Prepare clock
+        this.clock = new THREE.Clock();
+
+        this.animate();
+    };
+    addEventListeners = () => {
+
         this.renderer.domElement.addEventListener(
             "mousemove",
             this.onDocumentMouseMove,
@@ -96,18 +130,8 @@ class thebuilder {
             this.onDocumentMouseDown,
             false
         );
-        this.fbxLoader("assets/3dmodels/25g.fbx", this.onRolloverLoad);
+    }
 
-        // Prepare Orbit controls
-        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-        this.controls.target = new THREE.Vector3(0, 0, 0);
-        this.controls.maxDistance = 5000;
-
-        // Prepare clock
-        this.clock = new THREE.Clock();
-
-        this.animate();
-    };
     animate = () => {
         requestAnimationFrame(this.animate);
         this.render();
@@ -123,12 +147,7 @@ class thebuilder {
         this.controls.update(delta);
     };
 
-    onDocumentMouseEnter = event => {
-        this.isMouseOver = true;
-    };
-    onDocumentMouseOut = event => {
-        this.isMouseOver = false;
-    };
+   
     onDocumentMouseMove = event => {
         event.preventDefault();
         if (!this.partLoaded || !this.rollOverLoaded) {
@@ -161,15 +180,7 @@ class thebuilder {
 
         let binder = this;
         loader.load(path, function(object) {
-            const eMap = new THREE.CubeTextureLoader()
-                .setPath("assets/3dmodels/images/cmap/")
-                .load(["px.png", "nx.png", "py.png", "ny.png", "pz.png", "nz.png"]);
-            binder.partMaterial = new THREE.MeshLambertMaterial({
-                color: 0xfeb74c,
-                envMap: eMap,
-                reflectivity: 0.7
-            });
-
+            
             object.traverse(function(child) {
                 if (child.isMesh) {
                     child.castShadow = true;
@@ -244,7 +255,7 @@ class thebuilder {
             return;
         }
         this.mouse.set(
-            (event.clientX / this.width) * 1 - 1, -(event.clientY / this.height) * 1 + 1
+            (event.clientX / this.width) * 2 - 1, -(event.clientY / this.height) * 2 + 1
         );
 
         this.raycaster.setFromCamera(this.mouse, this.camera);

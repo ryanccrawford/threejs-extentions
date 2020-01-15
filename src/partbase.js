@@ -7,12 +7,12 @@ class PartBase {
     
     name = '';
     importFile = '';
-    partMesh;
+    partMesh = null;
     loader = new FBXLoader();
-    material;
-    height;
-    width;
-    position;
+    material = null;
+    height = null;
+    width = null;
+    position = null;
     isImportComplete = false;
 
     constructor(options = new PartOptions()) {
