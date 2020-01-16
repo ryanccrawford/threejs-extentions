@@ -14,6 +14,8 @@ import Mpn25g from "./mpn25g.js";
 import Mpn25ag5 from "./mpn25ag5.js";
 import MpnSb25g5 from "./mpnsb25g5.js"
 import {PartOptions} from "./partbase.js";
+import * as THREE from "three";
+
 class tower {
 
     model = "";
@@ -36,30 +38,56 @@ class tower {
         this.loader = new FBXLoader();
 
     }
-
+    onloadDone = (part) => {
+        if(this.height < 10){
+           this.setHeight(10)
+        }
+        
+    }
     setModel = (model) => {
         let classesToLoad = [];
         switch (model) {
             case "25G":
+                this.onloadDone.bind(this)
                 this.sectionClass = "Mpn25g" 
-                
-                this.sectionObj = new Mpn25g(new PartOptions());
+                const option = new PartOptions()
+                option.readyCallback = this.onloadDone
+                this.sectionObj = new Mpn25g(option);
+                this.sectionObj.getPart()
                 this.baseClass = "MpnSb25g5"
-                this.baseObj = new MpnSb25g5(new PartOptions());
+                this.baseObj = new MpnSb25g5(option);
+                this.baseObj.getPart();
                 this.topCapClass = "Mpn25ag5"
-                this.topObj = new Mpn25ag5(new PartOptions());
+                this.topObj = new Mpn25ag5(option);
+                this.topObj.getPart();
+                this.model = model;
                 break;
         }
 
 
     }
 
-  
+  readyToaddToScene = () => {
+        console.log(this)
+    
+  }
 
     setHeight = (height) => {
         this.height = height;
         this.numberOfSections = parseInt((this.height / 10) - 1); 
+        if(this.sectionObj.isImportComplete){
+            this.parts = [];
+            for(let i = 0; i < this.numberOfSections;i++){
+                const newSection = this.sectionObj.clone();
+                this.parts.push(newSection);
+            }
+            const Group = new THREE.Group();
+            Group.add(this.parts)
+            Group.add(this.baseObj.partMesh)
+            Group.add(this.baseObj.partMesh)
 
+            this.readyToaddToScene()
+        }
     }
 
 }
@@ -143,14 +171,16 @@ const getHeightOption = () => {
 }
 
 const onStart = event => {
-    event.preventDefault();
+    //event.preventDefault();
     const itemSelected = event.target.selectedOptions[event.target.selectedIndex];
+    //itemSelected.selected = true;
     console.log(itemSelected.textContent);
     thisTower.setModel(itemSelected.textContent);
     const heightOptions = getHeightOption()
    
     let label = "Select Tower Height"
-   const heightSelectBox = makeSelectBox("height", "height", "Select Height of Tower", onHeightSelect);
+    heightOptions.push({id: 0, name: label, isSelected: true})
+   const heightSelectBox = makeSelectBox("height", "height", label, onHeightSelect);
   
    for(let i = 0; i< heightOptions.length; i++){
        const opt = document.createElement("option");
@@ -168,10 +198,12 @@ const onStart = event => {
 
 
 const onHeightSelect = event => {
-    event.preventDefault();
+    //event.preventDefault();
     const itemSelected = parseInt(event.target.selectedOptions[0].text);
     thisTower.setHeight(itemSelected);
-    
+    if(Thebuilder){
+        Thebuilder.scene.add(thisTower.parts);
+    }
 
 }
 
@@ -244,8 +276,27 @@ pageBody.appendChild(bottom)
 
 document.body.appendChild(pageBody);
 
-const theWidth = renderarea.lientWidth - 20;
+const theWidth = renderarea.clientWidth;
 const theHeight = window.screen.availHeight - (0.30 * window.screen.availHeight);
 const Thebuilder = new thebuilder(theHeight, theWidth, "renderarea");
 Thebuilder.attach();
 
+const updateOffset = (event) => {
+    event.preventDefault();
+    let tempholder =  parseFloat(event.target.value);
+    if(isNaN(tempholder)){
+        offsetAmount = offsetAmount;
+        return;
+    }
+    offsetAmount = tempholder;
+}
+const debugInput = () => {
+    const input = document.createElement("input")
+    input.id = "mouseOffset"
+    input.type = "number"
+    input.min = "0.00001"
+    input.value = offsetAmount
+    input.addEventListener("onchange", updateOffset)
+    document.getElementById('debug').appendChild(input)
+}
+debugInput();

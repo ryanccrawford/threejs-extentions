@@ -151,10 +151,11 @@ class thebuilder {
     }
     
     animate = () => {
-        requestAnimationFrame(this.animate);
+        
         this.update();
         this.render();
         this.updateMousePosition();
+        requestAnimationFrame(this.animate);
     };
 
     updateMousePosition = () => {
@@ -165,6 +166,7 @@ class thebuilder {
             "mouse"
         );
         this.components.replaceElement("mouse", newMouseDisplay);
+      
     };
 
     render = () => {
@@ -189,8 +191,9 @@ class thebuilder {
 
     onDocumentMouseMove = event => {
         event.preventDefault();
-        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.75;
-        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.75;
+        
+        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.53;
+        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
 
         this.mouse.set(x, y);
         if (!this.rollOverLoaded) {
@@ -261,8 +264,8 @@ class thebuilder {
     onDocumentMouseDown = event => {
         event.preventDefault();
 
-        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.75;
-        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.75;
+        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.53;
+        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
 
         this.mouse.set(x, y);
         if (!this.rollOverLoaded) {

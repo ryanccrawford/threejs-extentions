@@ -11,17 +11,17 @@ app.get("/", (req, res) => res.send("Hello World!"));
 
 app.listen(port, () => console.log(`API Server started on port ${port}!`));
 
-class Part extends Model {}
-Part.init({
-    // attributes
-    FBXfile: {
-        type: Sequelize.STRING,
-        allowNull: false
-    },
-    name: {
-        type: Sequelize.STRING
-    }
-}, {
-    sequelize,
-    modelName: 'part'
-});
+// class Part extends Model {}
+// Part.init({
+//     // attributes
+//     FBXfile: {
+//         type: Sequelize.STRING,
+//         allowNull: false
+//     },
+//     name: {
+//         type: Sequelize.STRING
+//     }
+// }, {
+//     sequelize,
+//     modelName: 'part'
+// });
