@@ -4,10 +4,10 @@ const port = 3000;
 const { Sequelize, Model, DataTypes } = require("sequelize");
 const sequelize = new Sequelize('database', 'username', 'password', {
     host: 'localhost',
-    dialect:  'mysql',
+    dialect: 'mysql',
 });
 
-app.get("/", (req, res) => res.send("Hello World!"));
+app.get("/api", (req, res) => res.send("Hello World!"));
 
 app.listen(port, () => console.log(`API Server started on port ${port}!`));
 

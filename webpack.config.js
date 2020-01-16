@@ -13,6 +13,7 @@ module.exports = {
         components: "./src/components.js",
         ToolIcon: "./src/toolicon.js",
         ToolBar: "./src/toolbar.js",
+        Materials: "./src/materials.js",
         PartOptions: "./src/partbase.js",
         PartBase: "./src/partbase.js",
         RolloverPart: "./src/rolloverpart.js",
@@ -21,15 +22,15 @@ module.exports = {
         APIData: "./src/databaseinterface.js",
         Mpn25ag5: "./src/mpn25ag5.js",
         MpnSb25g5: "./src/mpnsb25g5.js",
-        Materials: "./src/materials.js"
+
     },
     devtool: "inline-source-map",
     devServer: {
         contentBase: "./dist",
         proxy: {
             "/api": {
-              target: 'http://localhost:3000',
-              pathRewrite: {'^/api' : ''}
+                target: 'http://localhost:3000',
+                pathRewrite: { '^/api': '' }
             }
         }
     },
@@ -76,7 +77,7 @@ module.exports = {
             title: "3 Star Inc. 3D Tower Builder",
             window: {
                 env: {
-                    apiHost: "https://tower-builder.herokuapp.com//api"
+                    apiHost: "http://localhost:3000/api"
                 }
             }
         })
