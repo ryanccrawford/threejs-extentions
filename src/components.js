@@ -154,6 +154,18 @@ class components {
 
     }   
 
+    selectBox = (id, name, label, onSelectionEvent) => {
+
+        
+        const select = this.c("select");
+        select.addEventListener("change", onSelectionEvent)
+        select.className = "custom-select custom-select-sm"
+        select.setAttribute("data-label", label)
+        select.id = id
+        select.name = name;
+        return select;
+    }
+
     replaceElement = (elementIdToReplace, element) => {
         const elementBeingReplace = document.getElementById(elementIdToReplace);
         const newElement = element;

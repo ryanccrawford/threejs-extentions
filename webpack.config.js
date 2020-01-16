@@ -16,13 +16,22 @@ module.exports = {
         PartOptions: "./src/partbase.js",
         PartBase: "./src/partbase.js",
         RolloverPart: "./src/rolloverpart.js",
-        TowerSection: "./src/towersection.js",
+        Mpn25g: "./src/mpn25g.js",
         thebuilder: "./src/threedbuilder.js",
         APIData: "./src/databaseinterface.js",
+        Mpn25ag5: "./src/mpn25ag5.js",
+        MpnSb25g5: "./src/mpnsb25g5.js",
+        Materials: "./src/materials.js"
     },
     devtool: "inline-source-map",
     devServer: {
-        contentBase: "./dist"
+        contentBase: "./dist",
+        proxy: {
+            "/api": {
+              target: 'http://localhost:3000',
+              pathRewrite: {'^/api' : ''}
+            }
+        }
     },
     plugins: [
         new CopyPlugin([{ from: "./src/assets", to: "./assets" }]),
@@ -33,9 +42,9 @@ module.exports = {
             appMountId: "app",
             appMountHtmlSnippet: '<div class="app-spinner"><i class="fa fa-spinner fa-spin fa-5x" aria-hidden="true"></i></div>',
             headHtmlSnippet: "<style>div.app-spinner {position: fixed;top:50%;left:50%;}</style >",
-            bodyHtmlSnippet: "<div id='threed'></div>",
+            bodyHtmlSnippet: "<script>var offsetAmount = 0.00;</script><div id='threed'></div><div style='position: absolute;left:0;top:0;'><div id='debug'></div></div>",
             //baseHref: "https://tower-builder.herokuapp.com/",
-            devServer: "https://3stb",
+            devServer: "http://localhost:8080",
             meta: [{
                 name: "description",
                 content: "3 Star Inc. 3D Tower Builder"
