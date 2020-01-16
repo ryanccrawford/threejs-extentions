@@ -9,88 +9,8 @@ import components from "./components.js";
 import thebuilder from "./threedbuilder.js";
 import ToolIcon from "./toolicon.js";
 import ToolBar from "./toolbar.js";
-import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
-import Mpn25g from "./mpn25g.js";
-import Mpn25ag5 from "./mpn25ag5.js";
-import MpnSb25g5 from "./mpnsb25g5.js"
-import { PartOptions } from "./partbase.js";
-import * as THREE from "three";
+import Tower25G from "./tower.js";
 
-class tower {
-
-    model = "";
-    height = 0;
-    numberOfSections = 0;
-    parts = [];
-    topCap = null;
-    base = null;
-    type = "";
-    asseccories = [];
-    loader = null;
-    sectionObj = null;
-    topCapObj = null;
-    baseObj = null;
-    sectionClass = "";
-    topCapClass = "";
-    baseClass = "";
-
-    constructor() {
-        this.loader = new FBXLoader();
-
-    }
-    onloadDone = (part) => {
-        if (this.height < 10) {
-            this.setHeight(10)
-        }
-
-    }
-    setModel = (model) => {
-        let classesToLoad = [];
-        switch (model) {
-            case "25G":
-                this.onloadDone.bind(this)
-                this.sectionClass = "Mpn25g"
-                const option = new PartOptions()
-                option.readyCallback = this.onloadDone
-                this.sectionObj = new Mpn25g(option);
-                this.sectionObj.getPart()
-                this.baseClass = "MpnSb25g5"
-                this.baseObj = new MpnSb25g5(option);
-                this.baseObj.getPart();
-                this.topCapClass = "Mpn25ag5"
-                this.topObj = new Mpn25ag5(option);
-                this.topObj.getPart();
-                this.model = model;
-                break;
-        }
-
-
-    }
-
-    readyToaddToScene = () => {
-        console.log(this)
-
-    }
-
-    setHeight = (height) => {
-        this.height = height;
-        this.numberOfSections = parseInt((this.height / 10) - 1);
-        if (this.sectionObj.isImportComplete) {
-            this.parts = [];
-            for (let i = 0; i < this.numberOfSections; i++) {
-                const newSection = this.sectionObj.clone();
-                this.parts.push(newSection);
-            }
-            const Group = new THREE.Group();
-            Group.add(this.parts)
-            Group.add(this.baseObj.partMesh)
-            Group.add(this.baseObj.partMesh)
-
-            this.readyToaddToScene()
-        }
-    }
-
-}
 
 function pageContainer() {
     const Components = new components();

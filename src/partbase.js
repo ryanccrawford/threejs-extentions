@@ -1,19 +1,19 @@
 import * as THREE from "three";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
-class PartBase {
+class PartBase extends THREE.Object3D {
     static meshInMemory;
     name = "";
     importFile = "";
-    partMesh;
     loader;
     material;
-    materialType;
-    height;
-    width;
+    dimHeight;
+    dimWidth;
+    dimLength;
     size;
     isImportComplete = false;
     readyCallback;
+    
 
     constructor(options = new PartOptions()) {
         this.name = options.name;
@@ -22,32 +22,34 @@ class PartBase {
         this.readyCallback = options.readyCallback;
         this.materialType = options.materialType;
         this.loader = new FBXLoader();
+        if(this.importFile.length > 0 && typeof this.readyCallback === 'function'){
+            this.getPart();
+        }
     }
 
     getPart = () => {
         if (this.importFile) {
-            console.log("Importing Part: Function getPart() was called");
             this.fileImporter();
         }
     }
 
     importComplete = part => {
-
-        this.partMesh = part;
-        this.height = this.getHeight();
-        this.width = this.getWidth();
-        this.length = this.getLength();
+        part.name = this.name
+        this.children = new [THREE.Object3D];
+        this.add(part);
+        this.dimHeight = this.getHeight();
+        this.dimWidth = this.getWidth();
+        this.dimLength = this.getLength();
         this.isImportComplete = true;
-        this.readyCallback(part);
-    }
-
-    position = () => {
-        if (this.isImportComplete) {
-            return this.partMesh.position;
+        if(typeof this.readyCallback === 'function'){
+            this.readyCallback(part);
         }
+        
     }
+    
     fileImporter = () => {
         const binder = this;
+        
         if (!self.meshInMemory) {
 
             this.loader.load(this.importFile, function(object) {
@@ -74,6 +76,15 @@ class PartBase {
 
             binder.importComplete(mesh)
         }
+    }
+
+    setMaterial = (material) => {
+        const bindermaterial = material
+        this.traverse(function(child) {
+            if (child.isMesh) {
+                child.material = bindermaterial;
+            }
+        });
     }
 
     getHeight = () => {
