@@ -4,7 +4,6 @@ import $ from "jquery";
 import "bootstrap";
 import Axios from "axios"
 import APIData from "./databaseinterface.js";
-import printMe from "./print.js";
 import components from "./components.js";
 import thebuilder from "./threedbuilder.js";
 import ToolIcon from "./toolicon.js";
@@ -40,6 +39,21 @@ function renderArea() {
     renderArea.setAttribute("id", "renderarea");
     renderArea.style.textAlign = "center";
     return renderArea
+}
+
+function bottomNavStick() {
+{/* <footer class="footer mt-auto py-3">
+  <div class="container">
+    <span class="text-muted">Place sticky footer content here.</span>
+  </div>
+</footer> */}
+
+const Components = new components();
+const footer = Components.c("footer");
+const div = Com
+const span = Components.c("span");
+
+
 }
 
 function buildMain(sideBarItems, renderArea) {
@@ -203,26 +217,8 @@ pageBody.appendChild(bottom)
 document.body.appendChild(pageBody);
 
 const theWidth = renderarea.clientWidth;
-const theHeight = window.screen.availHeight - (0.30 * window.screen.availHeight);
+const usedSpace = document.getElementsByClassName('jumbotron')[0].clientHeight + 150;
+const theHeight = window.screen.availHeight - usedSpace;
 const Thebuilder = new thebuilder(theHeight, theWidth, "renderarea");
-Thebuilder.attach();
+Thebuilder.attach(document);
 
-const updateOffset = (event) => {
-    event.preventDefault();
-    let tempholder = parseFloat(event.target.value);
-    if (isNaN(tempholder)) {
-        offsetAmount = offsetAmount;
-        return;
-    }
-    offsetAmount = tempholder;
-}
-const debugInput = () => {
-    const input = document.createElement("input")
-    input.id = "mouseOffset"
-    input.type = "number"
-    input.min = "0.00001"
-    input.value = offsetAmount
-    input.addEventListener("onchange", updateOffset)
-    document.getElementById('debug').appendChild(input)
-}
-debugInput();

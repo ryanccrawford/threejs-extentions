@@ -15,33 +15,26 @@ class thebuilder {
     renderer;
     objects = [];
     raycaster;
-    rollOverMesh;
-    rollOverObject;
-    rollOverMaterial;
-    partGeo;
-    partMaterial;
     chromeMaterial;
     appendToElement;
     mouse;
     height;
     width;
-    isShiftDown = false;
-    rollOverLoaded = false;
     components;
     mouseDisplay;
     canvas;
-    prevMousePosition;
     newParts = [];
     floor;
+    documentRef;
 
     constructor(height = 500, width = 800, appendToElement = "") {
         this.components = new components();
-        this.height = 750;
+        this.height = height;
         this.width = width;
         this.appendToElement = appendToElement;
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-        this.rollOverMaterial = new Materials().RollOver;
+       
         this.createCamera();
     }
     createCamera = () => {
@@ -93,7 +86,7 @@ class thebuilder {
     }
     eventLightsReady = () => {
             this.createFloor();
-            this.createRollOver();
+        
             
     }
     createRenderer = () => {
@@ -112,39 +105,28 @@ class thebuilder {
         this.clock = new THREE.Clock();
         this.animate();
      }
-    attach = () => {
-       
+    attach = (documentRef) => {
+
+            this.documentRef = documentRef;
             this.createRenderer();
     }
 
     addEventListeners = () => {
 
-       this.renderer.domElement.addEventListener(
+        this.renderer.domElement.addEventListener(
             "mousemove",
             this.onDocumentMouseMove
         )
-
-        window.addEventListener("resize", this.onResize);
 
         this.renderer.domElement.addEventListener(
             "mousedown",
             this.onDocumentMouseDown
         );
-    
-    }
-    createRollOver = () => {
+
+        window.addEventListener("resize", this.onResize);
+
         
-
-        let rollOverOptions = new PartOptions();
-
-        rollOverOptions.material = this.rollOverMaterial;
-       
-        rollOverOptions.name = "Rollover Part";
-        rollOverOptions.importFile = "assets/3dmodels/25G.fbx";
-        rollOverOptions.readyCallback = this.onRolloverLoad.bind(this);
-
-        this.rollOverObject = new RolloverPart(rollOverOptions);
-        this.rollOverObject.getPart();
+    
     }
     
     animate = () => {
@@ -172,7 +154,6 @@ class thebuilder {
 
     update = () => {
         this.updateMousePosition();
-        this.camera.updateProjectionMatrix();
      }
 
     onResize = event => {
@@ -193,95 +174,122 @@ class thebuilder {
         const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
 
         this.mouse.set(x, y);
-        if (!this.rollOverLoaded) {
-            return;
-        }
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-
-        const intersects = this.raycaster.intersectObjects(this.objects);
-
-        if (intersects.length > 0) {
-            const intersect = intersects[0];
-            
-            this.rollOverMesh
-                .position
-                .copy(intersect.point)
-                .add(intersect.face.normal);
-
-            this.rollOverMesh
-                .position
-                .divideScalar(50)
-                .floor()
-                .multiplyScalar(50)
-                .addScalar(50);
-                
-        }
-    };
-
-    onRolloverLoad = (part) => {
-        if(typeof this.rollOverMesh === 'undefined'){
-            this.rollOverMesh = part;
-        }
-        this.scene.add(this.rollOverMesh);
-
-        this.rollOverLoaded = true;   
-       
+      
     }
-    onVoxelLoad = (part) => {
 
-        const voxel = part;
-        const intersects = this.raycaster.intersectObjects(this.objects);
-        if (intersects.length > 0) {
-            var intersect = intersects[0];
-            if (this.isShiftDown) {
-                if (intersect.object !== this.floor) {
-                    this.scene.remove(intersect.object);
-
-                    this.objects.splice(this.objects.indexOf(intersect.object), 1);
-                }
-            } else {
-                voxel
-                    .position
-                    .copy(intersect.point)
-                    .add(intersect.face.normal);
-
-                voxel
-                    .position
-                    .divideScalar(50)
-                    .floor()
-                    .multiplyScalar(50)
-                    .addScalar(50);
-                this.scene.add(voxel);
-                this.objects.push(voxel);
-               // this.camera.lookAt(voxel.position)
-            }
-        }
-    };
+ 
 
     onDocumentMouseDown = event => {
         event.preventDefault();
 
-        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.53;
-        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
-
-        this.mouse.set(x, y);
-        if (!this.rollOverLoaded) {
-            return;
-        }
-
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-
-        const intersects = this.raycaster.intersectObjects(this.objects);
-
-        if (intersects.length > 0) {
-            const newOptions = new PartOptions();
-            newOptions.readyCallback = this.onVoxelLoad.bind(this);
-            const newPart = new Mpn25g(newOptions);
-            newPart.getPart();
-            this.newParts.push(newPart);
-           
-        }
-    };
+        
+    }
 }
 
 export default thebuilder;
+
+
+// const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.53;
+//         const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
+
+//         this.mouse.set(x, y);
+//         if (!this.rollOverLoaded) {
+//             return;
+//         }
+
+//         this.raycaster.setFromCamera(this.mouse, this.camera);
+
+//         const intersects = this.raycaster.intersectObjects(this.objects);
+
+//         if (intersects.length > 0) {
+         
+            
+//             const intersects = this.raycaster.intersectObjects(this.objects);
+          
+//                 var intersect = intersects[0];
+                
+//                 if (this.isShiftDown) {
+//                     if (intersect.object !== this.floor) {
+//                         this.scene.remove(intersect.object);
+    
+//                         this.objects.splice(this.objects.indexOf(intersect.object), 1);
+//                     }
+//                 } else {
+                    
+//                     const voxel = this.rollOverMesh.staticClone();
+//                     voxel.setMaterial(this.chromeMaterial);
+                    
+//                     voxel
+//                         .position
+//                         .copy(intersect.point)
+//                         .add(intersect.face.normal);
+    
+//                     voxel
+//                         .position
+//                         .divideScalar(50)
+//                         .floor()
+//                         .multiplyScalar(50)
+//                         .addScalar(50);
+                        
+//                     this.scene.add(voxel);
+//                     this.objects.push(voxel);
+//                    // this.camera.lookAt(voxel.position)
+//                 }
+            
+
+//         }
+
+// if (!this.rollOverLoaded) {
+//     return;
+// }
+// this.raycaster.setFromCamera(this.mouse, this.camera);
+
+// const intersects = this.raycaster.intersectObjects(this.objects);
+
+// if (intersects.length > 0) {
+//     const intersect = intersects[0];
+    
+//     this.rollOverMesh
+//         .position
+//         .copy(intersect.point)
+//         .add(intersect.face.normal);
+
+//     this.rollOverMesh
+//         .position
+//         .divideScalar(50)
+//         .floor()
+//         .multiplyScalar(50)
+//         .addScalar(50);
+        
+// }
+
+
+
+
+
+// let rollOverOptions = new PartOptions();
+
+//         rollOverOptions.material = this.rollOverMaterial;
+       
+//         rollOverOptions.name = "Rollover Part";
+//         rollOverOptions.importFile = "assets/3dmodels/25G.fbx";
+//         rollOverOptions.readyCallback = this.onRolloverLoad.bind(this);
+
+//         this.rollOverObject = new RolloverPart(rollOverOptions);
+//         this.rollOverObject.getPart();
+
+
+// onRolloverLoad = (part) => {
+//     if(typeof this.rollOverMesh === 'undefined'){
+//         this.rollOverMesh = part;
+//     }
+//     this.scene.add(this.rollOverMesh);
+
+//     this.rollOverLoaded = true;   
+   
+// }
+
+// this.renderer.domElement.addEventListener(
+//     "mousedown",
+//     this.onDocumentMouseDown
+// );
