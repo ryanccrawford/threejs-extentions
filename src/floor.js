@@ -1,37 +1,38 @@
 import * as THREE from "three";
-import { PartBase } from "./partbase.js"
+import { PartBase, PartOptions } from "./partbase.js"
 
 class Floor extends PartBase {
 
-    dimLength = 1000;
-    dimWidth = 1000;
-    hasGrid = true;
-    gridColor = "#ffffff"
-    gridDivisions = 10;
-    rotateBy = -90;
+    gridLength;
+    gridWidth;
+    hasGrid;
+    gridColor;
+    gridDivisions;
     grid;
 
 
     constructor(options) {
+        options.name = "Floor"
         
         super(options)
-        this.hasGrid = options.hasGrid || this.hasGrid;
-        this.gridDivisions = options.gridDivisions || this.gridDivisions;
-        this.gridColor = options.gridColor;
-        this.dimLength = options.length || this.length;
-        this.dimWidth = options.width || this.width; 
-        this.sceneRef = options.scene;
-        if (typeof this.readyCallback === 'function') {
-            this.createFloor();
+        this.hasGrid = options.hasGrid || true;
+        if (options.hasGrid) {
+            this.gridDivisions = options.gridDivisions || 20;
+            this.gridColor = options.gridColor || "#ffffff";
+            this.gridLength = options.gridLength || 1000;
+            this.gridWidth = options.gridWidth || 1000;
         }
+        this.sceneRef = options.sceneRef;
+        this.createFloor();
     }
 
     createFloor = () => {
         if (this.hasGrid) {
-            const gridHelper = new THREE.GridHelper((this.dimLength + this.dimWidth) / 2 , this.gridDivisions, this.gridColor);
-            this.grid = gridHelper;
+            const gridHelper = new THREE.GridHelper((this.gridLength + this.gridWidth) / 2, this.gridDivisions, this.gridColor);
+            this.add(gridHelper)
+            this.sceneRef.add(gridHelper);
         }
-            const geometry = new THREE.PlaneBufferGeometry(this.length, this.width);
+            const geometry = new THREE.PlaneBufferGeometry(this.gridLength, this.gridWidth);
             geometry.rotateX(-Math.PI / 2);
             const floor = new THREE.Mesh(
                 geometry,
@@ -45,15 +46,14 @@ class Floor extends PartBase {
 
 }
 
-class FloorOptions {
-    name = "Floor";
-    length = 1000;
-    width = 1000;
-    readyCallback;
-    hasGrid = true;
-    gridColor = "#ffffff"
-    gridDivisions = 10;
-    rotateBy = -90;
+class FloorOptions extends PartOptions {
+
+    gridLength;
+    gridWidth;
+    hasGrid;
+    gridColor;
+    gridDivisions;
+    sceneRef;
 }
 
 export { Floor, FloorOptions };

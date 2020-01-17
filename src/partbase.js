@@ -16,17 +16,16 @@ class PartBase extends THREE.Object3D {
 
     constructor(options) {
         super();
-
         this.name = options.name || "";
         this.material = options.material || null;
         this.importFile = options.importFile || "";
         this.readyCallback = options.readyCallback;
-        this.loader = new FBXLoader();
-        if(this.importFile.length > 0 && typeof this.readyCallback === 'function'){
-            this.getPart();
-        } else {
-            throw "You must provide a callback function."
+        if (this.name === "Floor") {
+            return;
         }
+        this.loader = new FBXLoader();
+        this.getPart();
+     
     }
 
     getPart = () => {
@@ -36,18 +35,12 @@ class PartBase extends THREE.Object3D {
     }
 
     importComplete = part => {
-        this.importFile = ""
-        part.name = this.name
-        this.children.length = 0;
-        this.attach(part);
+        this.add(part);
         this.dimHeight = this.getHeight();
         this.dimWidth = this.getWidth();
         this.dimLength = this.getLength();
         this.isImportComplete = true;
-        if(typeof this.readyCallback === 'function'){
             this.readyCallback(part);
-        }
-        
     }
     
     fileImporter = () => {
@@ -83,7 +76,7 @@ class PartBase extends THREE.Object3D {
 
     setMaterial = (material) => {
         const bindermaterial = material
-        this.traverse(function(child) {
+        this.children.traverse(function(child) {
             if (child.isMesh) {
                 child.material = bindermaterial;
             }

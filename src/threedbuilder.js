@@ -70,17 +70,17 @@ class thebuilder {
         const options = new FloorOptions();
         options.name = "Floor";
         options.gridDivisions = 20
-        options.length = 1000;
-        options.width = 1000;
+        options.gridLength = 1000;
+        options.gridWidth = 1000;
         options.readyCallback = this.onFloorReady.bind(this)
         options.hasGrid = true;
-        this.floor = new Floor(options)
+        options.sceneRef = this.scene;
+        this.floorRef = new Floor(options)
     }
     onFloorReady = (floor) => {
-        this.scene.add(this.floor.grid)
-        this.floorRef = floor;
-        this.scene.add(this.floorRef);
-        this.objects.push(this.floorRef);
+        this.floor = floor
+        this.scene.add(this.floor);
+        this.objects.push(this.floor);
     }
     createLights = () => {
         const ambientLight = new THREE.AmbientLight(0x606060);
