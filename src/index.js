@@ -10,6 +10,7 @@ import ToolIcon from "./toolicon.js";
 import ToolBar from "./toolbar.js";
 import Tower25G from "./tower.js";
 
+const Thebuilder = new thebuilder();
 
 function pageContainer() {
     const Components = new components();
@@ -93,7 +94,7 @@ function makeSelectBox(id, name, label, onSelectionEvent) {
 }
 
 
-const thisTower = new Tower25G();
+
 const showHeightSelection = (box) => {
     towerSelect.getElementsByClassName("card-body")[0].appendChild(box)
 }
@@ -115,7 +116,7 @@ const onStart = event => {
     const itemSelected = event.target.selectedOptions[event.target.selectedIndex];
     //itemSelected.selected = true;
     console.log(itemSelected.textContent);
-    thisTower.setModel(itemSelected.textContent);
+    //setModel(itemSelected.textContent);
     const heightOptions = getHeightOption()
 
     let label = "Select Tower Height"
@@ -140,10 +141,9 @@ const onStart = event => {
 const onHeightSelect = event => {
     //event.preventDefault();
     const itemSelected = parseInt(event.target.selectedOptions[0].text);
-    thisTower.setHeight(itemSelected);
-    if (Thebuilder) {
-        Thebuilder.scene.add(thisTower.parts);
-    }
+    Thebuilder.tower.changeHeight(itemSelected);
+    Thebuilder.tower.towerBuild();
+    
 
 }
 
@@ -181,16 +181,9 @@ const onDataRetured = data => {
         seiresSelectBox.appendChild(opt);
     }
 
-
-
-
-
-
     doneCreatingOptions();
 
 }
-
-
 
 database.getData("getSeiresOptions", onDataRetured, onDataRetured);
 
@@ -219,6 +212,9 @@ document.body.appendChild(pageBody);
 const theWidth = renderarea.clientWidth;
 const usedSpace = document.getElementsByClassName('jumbotron')[0].clientHeight + 150;
 const theHeight = window.screen.availHeight - usedSpace;
-const Thebuilder = new thebuilder(theHeight, theWidth, "renderarea");
+Thebuilder.setHeight(theHeight)
+Thebuilder.setWidth(theWidth)
+Thebuilder.setRenderElementId("renderarea");
+Thebuilder.start()
 Thebuilder.attach(document);
 

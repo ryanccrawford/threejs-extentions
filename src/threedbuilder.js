@@ -7,6 +7,9 @@ import { RolloverPart } from "./rolloverpart.js";
 import components from "./components.js";
 import Materials from "./materials.js";
 import { Floor, FloorOptions } from "./floor.js";
+import Tower25 from "./tower.js"
+import Mpn25ag5 from './mpn25ag5.js';
+import MpnSb25g5 from './mpnsb25g5.js';
 
 class thebuilder {
     scene;
@@ -26,17 +29,27 @@ class thebuilder {
     newParts = [];
     floor;
     documentRef;
+    tower;
 
-    constructor(height = 500, width = 800, appendToElement = "") {
+    constructor() {
         this.components = new components();
-        this.height = height;
-        this.width = width;
-        this.appendToElement = appendToElement;
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-       
+        this.tower = new Tower25();
+    }
+    setHeight = (height) => {
+        this.height = height;
+    }
+    setWidth = (width) => {
+        this.width = width;
+    }
+    setRenderElementId = (elementId) => {
+        this.appendToElement = elementId;
+    }
+    start = () => {
         this.createCamera();
     }
+
     createCamera = () => {
         this.camera = new THREE.PerspectiveCamera(
             45,
@@ -177,6 +190,18 @@ class thebuilder {
       
     }
 
+    changeTowerHeight = (height) => {
+        let ob = this.scene.getObjectsByName(this.tower.name)
+        this.scene.remove(ob)
+        const top = new Mpn25ag5();
+        const base = new MpnSb25g5();
+        this.tower.changeBase(base);
+        this.tower.changeTopCap(top);
+        this.tower.changeHeight(height);
+        this.tower.towerBuild();
+        this.scene.add(this.tower)
+
+    }
  
 
     onDocumentMouseDown = event => {
