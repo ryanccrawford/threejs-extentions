@@ -6,9 +6,11 @@ import Mpn25g from "./mpn25g.js";
 import { RolloverPart } from "./rolloverpart.js";
 import components from "./components.js";
 import Materials from "./materials.js";
+import { Floor, FloorOptions } from "./floor.js";
 
 class thebuilder {
     scene;
+    floorRef;
     camera;
     renderer;
     objects = [];
@@ -24,7 +26,6 @@ class thebuilder {
     height;
     width;
     isShiftDown = false;
-    partLoaded = false;
     rollOverLoaded = false;
     components;
     mouseDisplay;
@@ -66,25 +67,21 @@ class thebuilder {
         this.createLights()
     }
     createFloor = () => {
-        
-        const gridHelper = new THREE.GridHelper(1000, 20);
-        this.scene.add(gridHelper);
-
-        const geometry = new THREE.PlaneBufferGeometry(1000, 1000);
-        geometry.rotateX(-Math.PI / 2);
-
-        const floor = new THREE.Mesh(
-            geometry,
-            new THREE.MeshBasicMaterial({
-                visible: true,
-                color: "#ffffff"
-            })
-        );
-        this.floor = floor;
-        this.scene.add(this.floor);
-        this.objects.push(this.floor);
+        const options = new FloorOptions();
+        options.name = "Floor";
+        options.gridDivisions = 20
+        options.length = 1000;
+        options.width = 1000;
+        options.readyCallback = this.onFloorReady.bind(this)
+        options.hasGrid = true;
+        this.floor = new Floor(options)
     }
- 
+    onFloorReady = (floor) => {
+        this.scene.add(this.floor.grid)
+        this.floorRef = floor;
+        this.scene.add(this.floorRef);
+        this.objects.push(this.floorRef);
+    }
     createLights = () => {
         const ambientLight = new THREE.AmbientLight(0x606060);
         this.scene.add(ambientLight);

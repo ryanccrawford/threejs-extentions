@@ -6,9 +6,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "webpack --watch",
-        "start": "webpack --progress --colors",
-        "dev-server": "nodemon ./server/server.js",
-        "dev-client": "webpack-dev-server --port 8080",
+        "start": "webpack-dev-server --port 8080",
         "build": "webpack"
     },
     "repository": {

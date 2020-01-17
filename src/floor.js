@@ -1,50 +1,59 @@
 import * as THREE from "three";
+import { PartBase } from "./partbase.js"
 
+class Floor extends PartBase {
 
-class Floor {
-    geometery;
-    material;
-    color;
-    length;
-    width;
-    readyCallback;
+    dimLength = 1000;
+    dimWidth = 1000;
+    hasGrid = true;
+    gridColor = "#ffffff"
+    gridDivisions = 10;
+    rotateBy = -90;
+    grid;
+
 
     constructor(options) {
-        this.material = options.material;
-        this.readyCallback = options.readyCallback;
-        this.color = options.color;
-        this.length = options.length;
-        this.width = options.width;
+        
+        super(options)
+        this.hasGrid = options.hasGrid || this.hasGrid;
+        this.gridDivisions = options.gridDivisions || this.gridDivisions;
+        this.gridColor = options.gridColor;
+        this.dimLength = options.length || this.length;
+        this.dimWidth = options.width || this.width; 
+        this.sceneRef = options.scene;
+        if (typeof this.readyCallback === 'function') {
+            this.createFloor();
+        }
     }
 
-    getFloor = () => {
-
-
-    };
-
-    floorComplete = part => {
-        this.height = part.height;
-        this.width = part.width;
-        this.position = part.position;
-        if (!self.meshInMemory) {
-            self.meshInMemory = part;
+    createFloor = () => {
+        if (this.hasGrid) {
+            const gridHelper = new THREE.GridHelper((this.dimLength + this.dimWidth) / 2 , this.gridDivisions, this.gridColor);
+            this.grid = gridHelper;
         }
-        this.partMesh = part;
-        this.isImportComplete = true;
-        this.readyCallback(this.partMesh);
+            const geometry = new THREE.PlaneBufferGeometry(this.length, this.width);
+            geometry.rotateX(-Math.PI / 2);
+            const floor = new THREE.Mesh(
+                geometry,
+                new THREE.MeshBasicMaterial({
+                    visible: false, 
+                })
+            )
+            
+        this.importComplete(floor)
     };
 
-    clone = () => {
-        return this.geometery.clone(true);
-    };
 }
 
 class FloorOptions {
-    name;
-    material;
-    importFile;
+    name = "Floor";
+    length = 1000;
+    width = 1000;
     readyCallback;
-    materialType;
+    hasGrid = true;
+    gridColor = "#ffffff"
+    gridDivisions = 10;
+    rotateBy = -90;
 }
 
 export { Floor, FloorOptions };

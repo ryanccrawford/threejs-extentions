@@ -79,7 +79,7 @@ function makeSelectBox(id, name, label, onSelectionEvent) {
 }
 
 
-const thisTower = new tower();
+const thisTower = new Tower25G();
 const showHeightSelection = (box) => {
     towerSelect.getElementsByClassName("card-body")[0].appendChild(box)
 }

@@ -3,7 +3,6 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 class PartBase extends THREE.Object3D {
     static meshInMemory;
-    name = "";
     importFile = "";
     loader;
     material;
@@ -15,15 +14,18 @@ class PartBase extends THREE.Object3D {
     readyCallback;
     
 
-    constructor(options = new PartOptions()) {
-        this.name = options.name;
-        this.material = options.material;
-        this.importFile = options.importFile;
+    constructor(options) {
+        super();
+
+        this.name = options.name || "";
+        this.material = options.material || null;
+        this.importFile = options.importFile || "";
         this.readyCallback = options.readyCallback;
-        this.materialType = options.materialType;
         this.loader = new FBXLoader();
         if(this.importFile.length > 0 && typeof this.readyCallback === 'function'){
             this.getPart();
+        } else {
+            throw "You must provide a callback function."
         }
     }
 
@@ -34,9 +36,10 @@ class PartBase extends THREE.Object3D {
     }
 
     importComplete = part => {
+        this.importFile = ""
         part.name = this.name
-        this.children = new [THREE.Object3D];
-        this.add(part);
+        this.children.length = 0;
+        this.attach(part);
         this.dimHeight = this.getHeight();
         this.dimWidth = this.getWidth();
         this.dimLength = this.getLength();
@@ -54,27 +57,27 @@ class PartBase extends THREE.Object3D {
 
             this.loader.load(this.importFile, function(object) {
                 //object.rotateX(THREE.Math.degToRad(-90));
+                const Meshes = new THREE.Object3D();
                 object.traverse(function(child) {
                     if (child.isMesh) {
-                        child.castShadow = true;
-                        child.receiveShadow = true;
                         child.material = binder.material;
+                        Meshes.add(child)
                     }
                 });
-                self.meshInMemory = object;
-                binder.importComplete(object);
+                self.meshInMemory = Meshes;
+                binder.importComplete(Meshes);
             });
         } else {
             const mesh = this.clone();
+            const Meshes = new THREE.Object3D();
             mesh.traverse(function(child) {
                 if (child.isMesh) {
-                    child.castShadow = true;
-                    child.receiveShadow = true;
                     child.material = binder.material;
+                    Meshes.add(child)
                 }
             });
 
-            binder.importComplete(mesh)
+            binder.importComplete(Meshes)
         }
     }
 
@@ -112,11 +115,11 @@ class PartBase extends THREE.Object3D {
         if (!this.size) {
             this.size = new THREE.Vector3();
         }
-        const box = new THREE.Box3().setFromObject(this.partMesh);
+        const box = new THREE.Box3().setFromObject(this);
         return box.getSize(this.size);
     };
 
-    clone = () => {
+    staticClone = () => {
         return self.meshInMemory.clone(true);
     }
 }
@@ -126,7 +129,6 @@ class PartOptions {
     material;
     importFile;
     readyCallback;
-    materialType;
 }
 
 export {

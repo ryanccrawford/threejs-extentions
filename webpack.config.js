@@ -21,12 +21,14 @@ module.exports = {
         thebuilder: "./src/threedbuilder.js",
         APIData: "./src/databaseinterface.js",
         Mpn25ag5: "./src/mpn25ag5.js",
-        MpnSb25g5: "./src/mpnsb25g5.js"
+        MpnSb25g5: "./src/mpnsb25g5.js",
+        FloorOptions: "./src/floor.js",
+        Floor: "./src/floor.js",
+        Tower25G: "./src/tower.js"
     },
     devtool: "inline-source-map",
     devServer: {
         historyApiFallback: true,
-        hot: true,
         contentBase: "./dist",
         host: "localhost", // Defaults to `localhost`
         port: 8080, // Defaults to 8080
@@ -41,9 +43,6 @@ module.exports = {
     plugins: [
         new CopyPlugin([{ from: "./src/assets", to: "./assets" }]),
         new CleanWebpackPlugin(),
-        new webpack.HotModuleReplacementPlugin({
-            multiStep: true
-        }),
         new HtmlWebpackPlugin({
             inject: false,
             template: require("html-webpack-template"),
