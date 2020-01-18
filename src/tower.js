@@ -8,7 +8,7 @@ import * as THREE from "three";
 
 class Tower25G extends THREE.Group {
 
-    towerModel = "25G";
+    towerModel;
     towerHeight;
     towerTopCap;
     towerBase ;
@@ -20,20 +20,36 @@ class Tower25G extends THREE.Group {
     useSectionAsBase = false;
 
     constructor() {
-
-        this.name = towerModel + " Tower";
-        this.towerTopCap = new THREE.Object3D({name: "Top Cap"});
-        this.towerBase = new THREE.Object3D({name: "Base"});
-        this.towerSections = new THREE.Group({name: "Sections"});
-        this.towerAccessories = new THREE.Group({name: "Accessories"})
-        this.towerSection = new Mpn25g();
+        super()
+        this.towerModel = "25G"
+        this.name = this.towerModel + " Tower";
+        this.towerTopCap = new THREE.Object3D();
+        this.towerTopCap.name = "Top Cap";
+        this.towerBase = new THREE.Object3D();
+        this.towerBase.name = "Base"
+        this.towerSections = new THREE.Group();
+        this.towerSections.name = "Sections"
+        this.towerAccessories = new THREE.Group()
+        this.towerAccessories.name = "Accessories"
+        const options = new PartOptions();
+        options.readyCallback = this.onSectionLoaded.bind(this)
+        this.towerSection = new Mpn25g(options);
     }
-        
+    onSectionLoaded = (part) => {
+        console.log(part)
+    }
+    onTopCapLoaded = (part) => {
+         console.log(part)
+    }
+    onBaseLoaded = (part) => {
+        console.log(part)
+
+    }
     changeHeight = (height) => {
         this.useSectionAsBase = false;
         this.towerHeight = height;
-        let numberOfSections = parseInt((this.height / 10) - 1);
-        if((this.height.toString()[1] === 5)){
+        let numberOfSections = parseInt((this.towerHeight / 10) - 1);
+        if ((this.towerHeight.toString()[1] === 5)) {
             this.useSectionAsBase = true;
             this.towerBase = null;
         }

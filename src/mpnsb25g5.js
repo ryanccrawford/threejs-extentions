@@ -5,6 +5,10 @@ import Materials from "./materials";
 class MpnSb25g5 extends PartBase {
 
 	constructor(options) {
+		if (typeof options === 'undefined') {
+			let options = new PartOptions();
+			options.readyCallback = null;
+		}
 		options.importFile = 'assets/3dmodels/SB25G5.fbx'
 		const chromeMaterial = new Materials().ShinnyChrome;
 

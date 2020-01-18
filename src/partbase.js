@@ -19,7 +19,12 @@ class PartBase extends THREE.Object3D {
         this.name = options.name || "";
         this.material = options.material || null;
         this.importFile = options.importFile || "";
-        this.readyCallback = options.readyCallback;
+        if (options.readyCallback === null) {
+            this.readyCallback = null;
+        } else {
+            this.readyCallback = options.readyCallback;
+        }
+        
         if (this.name === "Floor") {
             return;
         }
@@ -40,7 +45,12 @@ class PartBase extends THREE.Object3D {
         this.dimWidth = this.getWidth();
         this.dimLength = this.getLength();
         this.isImportComplete = true;
-            this.readyCallback(part);
+        if (this.readyCallback === null) {
+            return;
+        } else {
+             this.readyCallback(part);
+        }
+           
     }
     
     fileImporter = () => {
@@ -50,27 +60,24 @@ class PartBase extends THREE.Object3D {
 
             this.loader.load(this.importFile, function(object) {
                 //object.rotateX(THREE.Math.degToRad(-90));
-                const Meshes = new THREE.Object3D();
+                
                 object.traverse(function(child) {
                     if (child.isMesh) {
                         child.material = binder.material;
-                        Meshes.add(child)
                     }
                 });
-                self.meshInMemory = Meshes;
-                binder.importComplete(Meshes);
+                self.meshInMemory = object;
+                binder.importComplete(object);
             });
         } else {
             const mesh = this.clone();
-            const Meshes = new THREE.Object3D();
             mesh.traverse(function(child) {
                 if (child.isMesh) {
                     child.material = binder.material;
-                    Meshes.add(child)
                 }
             });
 
-            binder.importComplete(Meshes)
+            binder.importComplete(mesh)
         }
     }
 

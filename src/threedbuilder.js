@@ -30,12 +30,29 @@ class thebuilder {
     floor;
     documentRef;
     tower;
+    basePart;
+    sectionPart
+    topCapPart
 
     constructor() {
         this.components = new components();
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-        this.tower = new Tower25();
+      
+    }
+    baseIsLoaded = (part) => { 
+        const opt2 = new PartOptions();
+        opt2.readyCallback = this.topIsLoaded.bind(this)
+        this.topCapPart = new Mpn25ag5(opt2)
+    }
+    topIsLoaded = (part) => {
+        const opt3 = new PartOptions();
+        opt3.readyCallback = this.sectionIsLoaded.bind(this)
+        this.sectionPart = new Mpn25g(opt3)
+    }
+    sectionIsLoaded = (part) => {
+        this.documentRef.body.style.backgroundColor = "red";
+        this.animate();
     }
     setHeight = (height) => {
         this.height = height;
@@ -109,14 +126,21 @@ class thebuilder {
          this.renderer.setPixelRatio(window.devicePixelRatio);
          this.renderer.setSize(this.width, this.height);
          this.onRendererReady()
-     }
+    }
+    insertTower = (tower) => {
+        this.tower = tower;
+    }
      onRendererReady = () => {
         document
         .getElementById(this.appendToElement)
         .appendChild(this.renderer.domElement);
-        this.addEventListeners();
-        this.clock = new THREE.Clock();
-        this.animate();
+         this.addEventListeners();
+         
+         this.clock = new THREE.Clock();
+           const opt1 = new PartOptions();
+           opt1.readyCallback = this.baseIsLoaded.bind(this)
+           this.basePart = new MpnSb25g5(opt1)
+       
      }
     attach = (documentRef) => {
 
@@ -193,8 +217,8 @@ class thebuilder {
     changeTowerHeight = (height) => {
         let ob = this.scene.getObjectsByName(this.tower.name)
         this.scene.remove(ob)
-        const top = new Mpn25ag5();
-        const base = new MpnSb25g5();
+        const top = this.topCapPart.clone();
+        const base = this.basePart.clone();
         this.tower.changeBase(base);
         this.tower.changeTopCap(top);
         this.tower.changeHeight(height);

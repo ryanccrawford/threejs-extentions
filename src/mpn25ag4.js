@@ -5,6 +5,10 @@ import Materials from "./materials";
 class Mpn25ag4 extends PartBase {
 
 	constructor(options) {
+		if (typeof options === 'undefined') {
+			let options = new PartOptions();
+			options.readyCallback = null;
+		}
 		options.importFile = 'assets/3dmodels/25AG4.fbx'
 		chromeMaterial = new Materials().ShinnyChrome;
 

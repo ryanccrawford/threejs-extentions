@@ -9,6 +9,7 @@ import thebuilder from "./threedbuilder.js";
 import ToolIcon from "./toolicon.js";
 import ToolBar from "./toolbar.js";
 import Tower25G from "./tower.js";
+var tower;
 
 const Thebuilder = new thebuilder();
 
@@ -43,11 +44,12 @@ function renderArea() {
 }
 
 function bottomNavStick() {
-{/* <footer class="footer mt-auto py-3">
+/* <footer class="footer mt-auto py-3">
   <div class="container">
     <span class="text-muted">Place sticky footer content here.</span>
   </div>
-</footer> */}
+</footer> */
+
 
 const Components = new components();
 const footer = Components.c("footer");
@@ -141,6 +143,9 @@ const onStart = event => {
 const onHeightSelect = event => {
     //event.preventDefault();
     const itemSelected = parseInt(event.target.selectedOptions[0].text);
+    tower = new Tower25G();
+    tower.changeHeight(itemSelected)
+    Thebuilder.insertTower(tower)
     Thebuilder.tower.changeHeight(itemSelected);
     Thebuilder.tower.towerBuild();
     
@@ -217,4 +222,5 @@ Thebuilder.setWidth(theWidth)
 Thebuilder.setRenderElementId("renderarea");
 Thebuilder.start()
 Thebuilder.attach(document);
+
 

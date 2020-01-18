@@ -1,11 +1,14 @@
 import * as THREE from "three";
-import {PartBase} from "./partbase.js";
+import {PartBase, PartOptions} from "./partbase.js";
 import Materials from "./materials.js";
 
 class Mpn25g extends PartBase {
 
 	constructor(options) {
-
+		if (typeof options === 'undefined') {
+			let options = new PartOptions();
+			options.readyCallback = null;
+		}
 		options.importFile = 'assets/3dmodels/25G.fbx'
 		const mat = new Materials();
 
