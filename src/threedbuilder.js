@@ -33,26 +33,23 @@ class thebuilder {
     basePart;
     sectionPart
     topCapPart
+    chrome;
 
     constructor() {
         this.components = new components();
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
-      
+      this.chrome = new Materials().ShinnyChrome;
+     
     }
     baseIsLoaded = (part) => { 
-        const opt2 = new PartOptions();
-        opt2.readyCallback = this.topIsLoaded.bind(this)
-        this.topCapPart = new Mpn25ag5(opt2)
+        
     }
     topIsLoaded = (part) => {
-        const opt3 = new PartOptions();
-        opt3.readyCallback = this.sectionIsLoaded.bind(this)
-        this.sectionPart = new Mpn25g(opt3)
+        
     }
     sectionIsLoaded = (part) => {
-        this.documentRef.body.style.backgroundColor = "red";
-        this.animate();
+        
     }
     setHeight = (height) => {
         this.height = height;
@@ -128,7 +125,11 @@ class thebuilder {
          this.onRendererReady()
     }
     insertTower = (tower) => {
-        this.tower = tower;
+        if (this.tower === undefined) {
+            this.tower = tower;
+        }
+        
+        this.tower.setParent(this)
     }
      onRendererReady = () => {
         document
@@ -137,15 +138,29 @@ class thebuilder {
          this.addEventListeners();
          
          this.clock = new THREE.Clock();
-           const opt1 = new PartOptions();
-           opt1.readyCallback = this.baseIsLoaded.bind(this)
-           this.basePart = new MpnSb25g5(opt1)
+         
        
      }
     attach = (documentRef) => {
 
             this.documentRef = documentRef;
-            this.createRenderer();
+        this.createRenderer();
+
+
+        const opt1 = new PartOptions();
+        opt1.material = this.chrome;
+       // opt1.readyCallback = this.baseIsLoaded.bind(this)
+        this.basePart = new MpnSb25g5(opt1)
+        const opt2 = new PartOptions();
+       // opt2.readyCallback = this.topIsLoaded.bind(this)
+        opt2.material = this.chrome;
+        this.topCapPart = new Mpn25ag5(opt2)
+        const opt3 = new PartOptions();
+       // opt3.readyCallback = this.sectionIsLoaded.bind(this)
+        opt3.material = this.chrome;
+        this.sectionPart = new Mpn25g(opt3)
+this.documentRef.body.style.backgroundColor = "red";
+this.animate();
     }
 
     addEventListeners = () => {
@@ -215,13 +230,15 @@ class thebuilder {
     }
 
     changeTowerHeight = (height) => {
-        let ob = this.scene.getObjectsByName(this.tower.name)
-        this.scene.remove(ob)
+     //   let ob = this.scene.getObjectsByName(this.tower.name)
+     //   this.scene.remove(ob)
+          console.log(this.topCapPart)
         const top = this.topCapPart.clone();
+      
         const base = this.basePart.clone();
         this.tower.changeBase(base);
         this.tower.changeTopCap(top);
-        this.tower.changeHeight(height);
+        this.tower.changeHeight(parseInt(height));
         this.tower.towerBuild();
         this.scene.add(this.tower)
 

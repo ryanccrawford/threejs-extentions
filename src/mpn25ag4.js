@@ -1,5 +1,8 @@
 import * as THREE from "three";
-import {PartBase} from "./partbase.js";
+import {
+	PartBase,
+	PartOptions
+} from "./partbase.js";
 import Materials from "./materials";
 
 class Mpn25ag4 extends PartBase {
@@ -10,10 +13,8 @@ class Mpn25ag4 extends PartBase {
 			options.readyCallback = null;
 		}
 		options.importFile = 'assets/3dmodels/25AG4.fbx'
-		chromeMaterial = new Materials().ShinnyChrome;
 
 		options.name = "25AG4"
-		options.material = chromeMaterial
 		super(options);
 	}
 

@@ -1,20 +1,26 @@
 import * as THREE from "three";
-import { PartBase } from "./partbase.js";
+import {
+	PartBase,
+	PartOptions
+} from "./partbase.js";
 import Materials from "./materials";
 
 class Mpn25gssb extends PartBase {
 
 	constructor(options) {
-		if (typeof options === 'undefined') {
-			let options = new PartOptions();
-			options.readyCallback = null;
-		}
-		options.importFile = 'assets/3dmodels/25GSSB.fbx'
-		chromeMaterial = new Materials().ShinnyChrome;
+			let opt = new PartOptions();
+			if (typeof options === 'undefined') {
 
-		options.name = "25GSSB"
-		options.material = chromeMaterial
-		super(options);
+				opt.readyCallback = null;
+			} else {
+				opt = options;
+			}
+		opt.importFile = 'assets/3dmodels/25GSSB.fbx'
+	
+
+		opt.name = "25GSSB"
+	
+		super(opt);
 	}
 
 

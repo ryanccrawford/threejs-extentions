@@ -60,7 +60,7 @@ const span = Components.c("span");
 }
 
 function buildMain(sideBarItems, renderArea) {
-
+    tower = new Tower25G();
     const layoutRow = new components().row();
     const layoutPartsListLeftSide = new components().col(2);
     sideBarItems.forEach((item) => {
@@ -133,6 +133,8 @@ const onStart = event => {
         opt.selected = heightOptions[i].isSelected;
         heightSelectBox.appendChild(opt);
     }
+   
+    
     showHeightSelection(heightSelectBox);
 
 }
@@ -141,14 +143,16 @@ const onStart = event => {
 
 
 const onHeightSelect = event => {
-    //event.preventDefault();
+    event.preventDefault();
+   
     const itemSelected = parseInt(event.target.selectedOptions[0].text);
-    tower = new Tower25G();
-    tower.changeHeight(itemSelected)
-    Thebuilder.insertTower(tower)
-    Thebuilder.tower.changeHeight(itemSelected);
-    Thebuilder.tower.towerBuild();
-    
+    if (Thebuilder.tower === undefined) {
+        Thebuilder.insertTower(tower)
+    }
+
+    Thebuilder.changeTowerHeight(itemSelected);
+   // Thebuilder.tower.towerBuild();
+    Thebuilder.scene.add(Thebuilder.tower)
 
 }
 
@@ -206,6 +210,8 @@ top.appendChild(title);
 
 const newMouseDisplay = new components().mousePosition(0, 0, 0, "mouse");
 let sideItems = [newMouseDisplay, bar, towerSelect];
+
+
 const main = buildMain(sideItems, renderArea())
 
 bottom.appendChild(main)
@@ -213,7 +219,6 @@ pageBody.appendChild(top);
 pageBody.appendChild(bottom)
 
 document.body.appendChild(pageBody);
-
 const theWidth = renderarea.clientWidth;
 const usedSpace = document.getElementsByClassName('jumbotron')[0].clientHeight + 150;
 const theHeight = window.screen.availHeight - usedSpace;
@@ -221,6 +226,7 @@ Thebuilder.setHeight(theHeight)
 Thebuilder.setWidth(theWidth)
 Thebuilder.setRenderElementId("renderarea");
 Thebuilder.start()
-Thebuilder.attach(document);
+
+ Thebuilder.attach(document);
 
 

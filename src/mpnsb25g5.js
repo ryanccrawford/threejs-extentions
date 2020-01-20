@@ -1,20 +1,25 @@
 import * as THREE from "three";
-import { PartBase }from "./partbase.js";
+import {
+	PartBase,
+	PartOptions
+} from "./partbase.js";
 import Materials from "./materials";
 
 class MpnSb25g5 extends PartBase {
 
 	constructor(options) {
+		let opt = new PartOptions();
 		if (typeof options === 'undefined') {
-			let options = new PartOptions();
-			options.readyCallback = null;
+			
+			opt.readyCallback = null;
+		} else {
+			opt = options
 		}
-		options.importFile = 'assets/3dmodels/SB25G5.fbx'
-		const chromeMaterial = new Materials().ShinnyChrome;
-
-		options.name = "SB25G5"
-		options.material = chromeMaterial
-		super(options);
+		opt.importFile = 'assets/3dmodels/SB25G5.fbx'
+		
+		opt.name = "SB25G5"
+		
+		super(opt);
 	}
 
 
