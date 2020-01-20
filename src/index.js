@@ -147,13 +147,14 @@ const onHeightSelect = event => {
     event.preventDefault();
 
     const itemSelected = parseInt(event.target.selectedOptions[0].text);
-    if (Thebuilder.tower === undefined) {
+    if (typeof Thebuilder.tower === 'undefined') {
         Thebuilder.insertTower(tower)
     }
 
-    Thebuilder.changeTowerHeight(itemSelected);
+    const towerToAdd = Thebuilder.changeTowerHeight(itemSelected);
     // Thebuilder.tower.towerBuild();
-    Thebuilder.scene.add(tower)
+    Thebuilder.tower = towerToAdd
+    Thebuilder.scene.add(towerToAdd)
 
 }
 
@@ -210,7 +211,7 @@ const title = titleBar();
 top.appendChild(title);
 
 const newMouseDisplay = new components().mousePosition(0, 0, 0, "mouse");
-const newInfoDisplay = new components().partPosition(["1", "2", "3"], "info");
+
 let sideItems = [newMouseDisplay, towerSelect];
 
 

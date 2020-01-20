@@ -51,7 +51,7 @@ class Tower25G extends THREE.Group {
 
 
     }
-    changeHeight = (height) => {
+    changeHeight = (height, section) => {
         this.useSectionAsBase = false;
         this.towerHeight = parseInt(height);
         console.log(this.towerHeight)
@@ -69,18 +69,15 @@ class Tower25G extends THREE.Group {
         newGroup.name = "Sections";
         let nextMountHeight = 0;
         let addHeight = 120;
-        console.log(this)
+        
         for (let i = 0; i < numberOfSections; i++) {
-            const newSection = this.towerSection.staticClone();
+            const newSection = section.staticClone();
             newSection.position.setY(nextMountHeight);
             nextMountHeight += addHeight;
             newGroup.add(newSection)
         }
         this.towerTopCapMountHeight = nextMountHeight;
         this.towerSections = newGroup;
-
-
-        console.log(this.towerSections)
     }
 
     changeBase = (base) => {

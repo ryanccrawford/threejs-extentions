@@ -42,7 +42,7 @@ class components {
         if (onClick) {
             button.addEventListener("click", onClick);
         }
-        console.log(button);
+      
         return button;
     };
 
@@ -96,6 +96,7 @@ class components {
     };
     partPosition = (lines = [], id = null) => {
         const div = document.createElement("div");
+        let newId = id !== null ? id.replace(" ", "").toLowerCase() : null
 
         let len = lines.length;
 
@@ -107,8 +108,8 @@ class components {
         }
 
         const card = this.card(div.innerHTML, "Info");
-        if (id) {
-            card.setAttribute("id", id);
+        if (newId) {
+            card.id = newId;
         }
         return card;
     };
@@ -185,10 +186,10 @@ class components {
     };
 
     replaceElement = (elementIdToReplace, element) => {
-        const elementBeingReplace = document.getElementById(elementIdToReplace);
-        const newElement = element;
+        const elementBeingReplace = document.getElementById(elementIdToReplace)
+        
         elementBeingReplace.parentNode.replaceChild(
-            newElement,
+            element,
             elementBeingReplace
         );
     };

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-//import { DragControls } from "three/examples/jsm/controls/DragControls.js";
+import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { PartOptions, OrbitConfig } from "./partbase.js";
 import Mpn25g from "./mpn25g.js";
 import { RolloverPart } from "./rolloverpart.js";
@@ -10,6 +10,7 @@ import { Floor, FloorOptions } from "./floor.js";
 import Tower25 from "./tower.js"
 import Mpn25ag5 from './mpn25ag5.js';
 import MpnSb25g5 from './mpnsb25g5.js';
+import Tower25G from './tower.js';
 
 class thebuilder {
     scene;
@@ -35,7 +36,12 @@ class thebuilder {
     topCapPart
     chrome;
     controls;
+    draggingControls;
     isTowerLoaded = false;
+    currentTowerID;
+    timesRemoved = 0;
+    lastIntersecpted;
+    lastIntersecptedMaterial;
 
 
     constructor() {
@@ -134,6 +140,7 @@ class thebuilder {
         }
 
         this.tower.setParent(this)
+        this.createDragingControls();
         this.isTowerLoaded = true;
     }
     onRendererReady = () => {
@@ -142,7 +149,7 @@ class thebuilder {
             .appendChild(this.renderer.domElement);
         this.addEventListeners();
         this.createControls();
-
+       
 
 
         this.clock = new THREE.Clock();
@@ -159,6 +166,10 @@ class thebuilder {
         this.controls.minPolarAngle = -1.4795;
         this.controls.maxPolarAngle = 1.4795;
 
+    }
+    createDragingControls = () => {
+        this.draggingControls = new DragControls(this.scene.children, this.camera, this.renderer.domElement);
+        
     }
     attach = (documentRef) => {
 
@@ -204,49 +215,29 @@ class thebuilder {
 
         this.update();
         this.render();
-        this.updateMousePosition();
-
         requestAnimationFrame(this.animate);
     };
 
-    updateInfo = (textArray = [], id) => {
-        const textDisplay = this.components.partPosition(textArray, id);
-        if (!document.getElementById(id)) {
-            const sidebar = document.getElementById("toolBars");
-            sidebar.appendChild(textDisplay)
-        } else {
-            this.components.replaceElement(id, textDisplay);
-        }
-    }
+   
     updateMousePosition = () => {
-        const newMouseDisplay = this.components.mousePosition(
-            this.mouse.x,
-            this.controls.getPolarAngle(),
-            0,
-            "mouse"
-        );
-        this.components.replaceElement("mouse", newMouseDisplay);
-
+        if(this.controls){
+            const newMouseDisplay = this.components.mousePosition(
+                this.mouse.x,
+                this.controls.getPolarAngle(),
+                0,
+                "mouse"
+            );
+            this.components.replaceElement("mouse", newMouseDisplay);
+        }
     };
 
     render = () => {
+    
         this.renderer.render(this.scene, this.camera);
     }
 
     update = () => {
         this.updateMousePosition();
-        if (this.isTowerLoaded) {
-            const binder = this
-            this.tower.children.forEach(function(child) {
-                let posx = child.position.x;
-                let posy = child.position.y;
-                let posz = child.position.z;
-                let name = child.name;
-                let id = name.replace(" ", "");
-                binder.updateInfo(["Name: " + name, "x: " + posx + " y: " + posy + "z: " + posz], name);
-            })
-
-        }
 
     }
 
@@ -269,157 +260,96 @@ class thebuilder {
 
         this.mouse.set(x, y);
 
+
     }
 
     changeTowerHeight = (height) => {
         //   let ob = this.scene.getObjectsByName(this.tower.name)
         //   this.scene.remove(ob)
-        console.log(this.topCapPart)
+        const newTower = new Tower25G();
+  
+        
+        if(this.timesRemoved > 0){
+            this.scene.remove(this.tower);
+        }
+        this.timesRemoved++
+        
         const top = this.topCapPart //.clone();
-
         const base = this.basePart //.clone();
-        this.tower.changeBase(base);
-        this.tower.changeTopCap(top);
-        this.tower.changeHeight(parseInt(height));
-        this.tower.towerBuild();
-        const bonder = this
-        this.tower.children.forEach(function(child) {
+        const section = this.sectionPart
+        newTower.changeBase(base);
+        newTower.changeTopCap(top);
+        newTower.changeHeight(parseInt(height), section);
+        newTower.towerBuild();
+        const bonder = newTower
+        newTower.children.forEach(function(child) {
             if (child.type === "Group") {
-                const bind = bonder;
-                child.traverse(function(child) {
-                    if (child.name.toLowerCase() === "section") {
-                        if (typeof child.createBoundingBox === "function") {
-                            const bb3 = child.createBoundingBox();
-                            bind.scene.add(bb3);
-                        }
-
+               
+                    if (typeof child.createBoundingBox === "function") {
+                        let bb3 = child.createBoundingBox();
+                        bonder.add(bb3);
                     }
-                })
+
             } else {
                 if (typeof child.createBoundingBox === "function") {
-                    const bb = child.createBoundingBox();
-                    bonder.scene.add(bb);
+                    let bb = child.createBoundingBox();
+                    bonder.add(bb);
                 }
             }
 
         })
-
-        this.scene.add(this.tower)
-
+        //this.tower = newTower;
+         return newTower;
     }
 
 
     onDocumentMouseDown = event => {
         event.preventDefault();
 
+        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.53;
+        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
 
-    }
+        this.mouse.set(x, y);
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        var pointA = new THREE.Vector3( 0, 0, 0 );
+        var direction = new THREE.Vector3( 10, 0, 0 );
+        direction.normalize();
+    
+        var distance = 100; // at what distance to determine pointB
+    
+        var pointB = new THREE.Vector3();
+        pointB.addVectors ( pointA, direction.multiplyScalar( distance ) );
+    
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push( pointA );
+        geometry.vertices.push( pointB );
+        var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+        var line = new THREE.Line( geometry, material );
+        this.scene.add( line );
+
+        const intersects = this.raycaster.intersectObjects(this.scene.children);
+
+        if (intersects.length > 0) {
+            const intersect = intersects[0];
+            if( intersect.object != this.lastIntersecpted){
+
+                if(this.lastIntersecpted){
+                    console.log(this.lastIntersecpted)
+                    this.lastIntersecpted.material.color.setHex(this.lastIntersecpted.currentHex);
+                    this.lastIntersecpted = intersect.object
+                    this.lastIntersecpted.currentHex = this.lastIntersecpted.material.color.getHex();
+                    this.lastIntersecpted.material.color.setHex("#023300");
+                }
+            }
+            
+        }else{
+            if(this.lastIntersecpted){
+                this.lastIntersecpted.material.color.setHex(this.lastIntersecpted.currentHex);
+                this.lastIntersecpted = null;
+            }
+        }
 }
-
+}
 export default thebuilder;
-
-
-// const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.53;
-//         const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
-
-//         this.mouse.set(x, y);
-//         if (!this.rollOverLoaded) {
-//             return;
-//         }
-
-//         this.raycaster.setFromCamera(this.mouse, this.camera);
-
-//         const intersects = this.raycaster.intersectObjects(this.objects);
-
-//         if (intersects.length > 0) {
-
-
-//             const intersects = this.raycaster.intersectObjects(this.objects);
-
-//                 var intersect = intersects[0];
-
-//                 if (this.isShiftDown) {
-//                     if (intersect.object !== this.floor) {
-//                         this.scene.remove(intersect.object);
-
-//                         this.objects.splice(this.objects.indexOf(intersect.object), 1);
-//                     }
-//                 } else {
-
-//                     const voxel = this.rollOverMesh.staticClone();
-//                     voxel.setMaterial(this.chromeMaterial);
-
-//                     voxel
-//                         .position
-//                         .copy(intersect.point)
-//                         .add(intersect.face.normal);
-
-//                     voxel
-//                         .position
-//                         .divideScalar(50)
-//                         .floor()
-//                         .multiplyScalar(50)
-//                         .addScalar(50);
-
-//                     this.scene.add(voxel);
-//                     this.objects.push(voxel);
-//                    // this.camera.lookAt(voxel.position)
-//                 }
-
-
-//         }
-
-// if (!this.rollOverLoaded) {
-//     return;
-// }
-// this.raycaster.setFromCamera(this.mouse, this.camera);
-
-// const intersects = this.raycaster.intersectObjects(this.objects);
-
-// if (intersects.length > 0) {
-//     const intersect = intersects[0];
-
-//     this.rollOverMesh
-//         .position
-//         .copy(intersect.point)
-//         .add(intersect.face.normal);
-
-//     this.rollOverMesh
-//         .position
-//         .divideScalar(50)
-//         .floor()
-//         .multiplyScalar(50)
-//         .addScalar(50);
-
-// }
-
-
-
-
-
-// let rollOverOptions = new PartOptions();
-
-//         rollOverOptions.material = this.rollOverMaterial;
-
-//         rollOverOptions.name = "Rollover Part";
-//         rollOverOptions.importFile = "assets/3dmodels/25G.fbx";
-//         rollOverOptions.readyCallback = this.onRolloverLoad.bind(this);
-
-//         this.rollOverObject = new RolloverPart(rollOverOptions);
-//         this.rollOverObject.getPart();
-
-
-// onRolloverLoad = (part) => {
-//     if(typeof this.rollOverMesh === 'undefined'){
-//         this.rollOverMesh = part;
-//     }
-//     this.scene.add(this.rollOverMesh);
-
-//     this.rollOverLoaded = true;   
-
-// }
-
-// this.renderer.domElement.addEventListener(
-//     "mousedown",
-//     this.onDocumentMouseDown
-// );
