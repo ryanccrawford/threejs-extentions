@@ -35,6 +35,8 @@ class thebuilder {
     topCapPart
     chrome;
     controls;
+    isTowerLoaded = false;
+
 
     constructor() {
         this.components = new components();
@@ -132,6 +134,7 @@ class thebuilder {
         }
 
         this.tower.setParent(this)
+        this.isTowerLoaded = true;
     }
     onRendererReady = () => {
         document
@@ -206,10 +209,14 @@ class thebuilder {
         requestAnimationFrame(this.animate);
     };
 
-    updateInfo = (textArray = []) => {
-        const textDisplay = this.components.partPosition(textArray, "info");
-        this.components.replaceElement("info", textDisplay);
-
+    updateInfo = (textArray = [], id) => {
+        const textDisplay = this.components.partPosition(textArray, id);
+        if (!document.getElementById(id)) {
+            const sidebar = document.getElementById("toolBars");
+            sidebar.appendChild(textDisplay)
+        } else {
+            this.components.replaceElement(id, textDisplay);
+        }
     }
     updateMousePosition = () => {
         const newMouseDisplay = this.components.mousePosition(
@@ -228,7 +235,19 @@ class thebuilder {
 
     update = () => {
         this.updateMousePosition();
-        this.updateInfo(["test", "test", "test"]);
+        if (this.isTowerLoaded) {
+            const binder = this
+            this.tower.children.forEach(function(child) {
+                let posx = child.position.x;
+                let posy = child.position.y;
+                let posz = child.position.z;
+                let name = child.name;
+                let id = name.replace(" ", "");
+                binder.updateInfo(["Name: " + name, "x: " + posx + " y: " + posy + "z: " + posz], name);
+            })
+
+        }
+
     }
 
     onResize = event => {
@@ -263,6 +282,28 @@ class thebuilder {
         this.tower.changeTopCap(top);
         this.tower.changeHeight(parseInt(height));
         this.tower.towerBuild();
+        const bonder = this
+        this.tower.children.forEach(function(child) {
+            if (child.type === "Group") {
+                const bind = bonder;
+                child.traverse(function(child) {
+                    if (child.name.toLowerCase() === "section") {
+                        if (typeof child.createBoundingBox === "function") {
+                            const bb3 = child.createBoundingBox();
+                            bind.scene.add(bb3);
+                        }
+
+                    }
+                })
+            } else {
+                if (typeof child.createBoundingBox === "function") {
+                    const bb = child.createBoundingBox();
+                    bonder.scene.add(bb);
+                }
+            }
+
+        })
+
         this.scene.add(this.tower)
 
     }

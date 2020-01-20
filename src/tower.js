@@ -78,6 +78,8 @@ class Tower25G extends THREE.Group {
         }
         this.towerTopCapMountHeight = nextMountHeight;
         this.towerSections = newGroup;
+
+
         console.log(this.towerSections)
     }
 
@@ -85,6 +87,7 @@ class Tower25G extends THREE.Group {
 
         if (!this.useSectionAsBase) {
             this.towerBase = base;
+
         } else if (this.useSectionAsBase) {
             this.towerBase = null;
         }
@@ -92,7 +95,8 @@ class Tower25G extends THREE.Group {
     }
 
     changeTopCap = (topCap) => {
-        this.towerTopCap = topCap
+        this.towerTopCap = topCap;
+
 
     }
 

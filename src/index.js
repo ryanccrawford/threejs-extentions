@@ -63,6 +63,7 @@ function buildMain(sideBarItems, renderArea) {
     tower = new Tower25G();
     const layoutRow = new components().row();
     const layoutPartsListLeftSide = new components().col(2);
+    layoutPartsListLeftSide.id = "toolBars"
     sideBarItems.forEach((item) => {
         layoutPartsListLeftSide.appendChild(item);
     })
@@ -210,7 +211,7 @@ top.appendChild(title);
 
 const newMouseDisplay = new components().mousePosition(0, 0, 0, "mouse");
 const newInfoDisplay = new components().partPosition(["1", "2", "3"], "info");
-let sideItems = [newMouseDisplay, newInfoDisplay, bar, towerSelect];
+let sideItems = [newMouseDisplay, towerSelect];
 
 
 const main = buildMain(sideItems, renderArea())

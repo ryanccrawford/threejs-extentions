@@ -118,6 +118,11 @@ class PartBase extends THREE.Object3D {
         const box = new THREE.Box3().setFromObject(this);
         return box.getSize(this.size);
     };
+    createBoundingBox = () => {
+
+        let bb = new THREE.BoxHelper(this, 0xffff00);
+        return bb
+    }
 
     staticClone = () => {
         return self.meshInMemory.clone(true);

@@ -102,7 +102,7 @@ class components {
         for (let i = 0; i < len; i++) {
             const infoElement = document.createElement("div");
             infoElement.className = "badge badge-primary";
-            infoElement.innerText = "info-line-" + i.toString() + ": " + lines[i];
+            infoElement.innerText = lines[i];
             div.appendChild(infoElement);
         }
 
