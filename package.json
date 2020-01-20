@@ -7,8 +7,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "webpack --watch",
         "start": "webpack-dev-server --open && cd server & npm start",
-        "build": "webpack",
-        "install": "cd /server && npm install"
+        "build": "webpack"
     },
     "repository": {
         "type": "git",
