@@ -44,17 +44,17 @@ function renderArea() {
 }
 
 function bottomNavStick() {
-/* <footer class="footer mt-auto py-3">
-  <div class="container">
-    <span class="text-muted">Place sticky footer content here.</span>
-  </div>
-</footer> */
+    /* <footer class="footer mt-auto py-3">
+      <div class="container">
+        <span class="text-muted">Place sticky footer content here.</span>
+      </div>
+    </footer> */
 
 
-const Components = new components();
-const footer = Components.c("footer");
-const div = Com
-const span = Components.c("span");
+    const Components = new components();
+    const footer = Components.c("footer");
+    const div = Com
+    const span = Components.c("span");
 
 
 }
@@ -133,8 +133,8 @@ const onStart = event => {
         opt.selected = heightOptions[i].isSelected;
         heightSelectBox.appendChild(opt);
     }
-   
-    
+
+
     showHeightSelection(heightSelectBox);
 
 }
@@ -144,15 +144,15 @@ const onStart = event => {
 
 const onHeightSelect = event => {
     event.preventDefault();
-   
+
     const itemSelected = parseInt(event.target.selectedOptions[0].text);
     if (Thebuilder.tower === undefined) {
         Thebuilder.insertTower(tower)
     }
 
     Thebuilder.changeTowerHeight(itemSelected);
-   // Thebuilder.tower.towerBuild();
-    Thebuilder.scene.add(Thebuilder.tower)
+    // Thebuilder.tower.towerBuild();
+    Thebuilder.scene.add(tower)
 
 }
 
@@ -209,7 +209,8 @@ const title = titleBar();
 top.appendChild(title);
 
 const newMouseDisplay = new components().mousePosition(0, 0, 0, "mouse");
-let sideItems = [newMouseDisplay, bar, towerSelect];
+const newInfoDisplay = new components().partPosition(["1", "2", "3"], "info");
+let sideItems = [newMouseDisplay, newInfoDisplay, bar, towerSelect];
 
 
 const main = buildMain(sideItems, renderArea())
@@ -219,6 +220,12 @@ pageBody.appendChild(top);
 pageBody.appendChild(bottom)
 
 document.body.appendChild(pageBody);
+if (module.hot) {
+    module.hot.accept('./threedbuilder.js', function() {
+        console.log("Accepting the updated threedbuilder module!");
+        printMe();
+    });
+}
 const theWidth = renderarea.clientWidth;
 const usedSpace = document.getElementsByClassName('jumbotron')[0].clientHeight + 150;
 const theHeight = window.screen.availHeight - usedSpace;
@@ -227,6 +234,4 @@ Thebuilder.setWidth(theWidth)
 Thebuilder.setRenderElementId("renderarea");
 Thebuilder.start()
 
- Thebuilder.attach(document);
-
-
+Thebuilder.attach(document);

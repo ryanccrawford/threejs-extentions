@@ -12,7 +12,7 @@ class PartBase extends THREE.Object3D {
     size;
     isImportComplete = false;
     readyCallback;
-    
+
 
     constructor(options) {
         super();
@@ -24,13 +24,13 @@ class PartBase extends THREE.Object3D {
         } else {
             this.readyCallback = options.readyCallback;
         }
-        
+
         if (this.name === "Floor") {
             return;
         }
         this.loader = new FBXLoader();
         this.getPart();
-     
+
     }
 
     getPart = () => {
@@ -48,19 +48,19 @@ class PartBase extends THREE.Object3D {
         if (this.readyCallback === null) {
             return;
         } else {
-             this.readyCallback(part);
+            this.readyCallback(part);
         }
-           
+
     }
-    
+
     fileImporter = () => {
         const binder = this;
-        
+
         if (!self.meshInMemory) {
 
             this.loader.load(this.importFile, function(object) {
                 //object.rotateX(THREE.Math.degToRad(-90));
-                
+
                 object.traverse(function(child) {
                     if (child.isMesh) {
                         child.material = binder.material;
@@ -131,7 +131,29 @@ class PartOptions {
     readyCallback;
 }
 
+class OrbitConfig {
+    enabled;
+    autoRotate;
+    dampingFactor;
+    domElement;
+    enableDamping;
+    enableKeys;
+    enablePan;
+    enableRotate;
+    enableZoom;
+    keyPanSpeed
+    keys;
+    maxDistance;
+    minDistance;
+    maxZoom;
+    mouseButtons;
+    object;
+    panSpeed;
+    rotateSpeed;
+}
+
 export {
     PartBase,
+    OrbitConfig,
     PartOptions
 };

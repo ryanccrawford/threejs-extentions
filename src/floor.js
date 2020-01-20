@@ -13,12 +13,12 @@ class Floor extends PartBase {
 
     constructor(options) {
         options.name = "Floor"
-        
+
         super(options)
         this.hasGrid = options.hasGrid || true;
         if (options.hasGrid) {
             this.gridDivisions = options.gridDivisions || 20;
-            this.gridColor = options.gridColor || "#ffffff";
+            this.gridColor = options.gridColor || "#222222";
             this.gridLength = options.gridLength || 1000;
             this.gridWidth = options.gridWidth || 1000;
         }
@@ -28,19 +28,19 @@ class Floor extends PartBase {
 
     createFloor = () => {
         if (this.hasGrid) {
-            const gridHelper = new THREE.GridHelper((this.gridLength + this.gridWidth) / 2, this.gridDivisions, this.gridColor);
+            const gridHelper = new THREE.GridHelper((this.gridLength + this.gridWidth) / 2, this.gridDivisions, this.gridColor, this.gridColor);
             this.add(gridHelper)
             this.sceneRef.add(gridHelper);
         }
-            const geometry = new THREE.PlaneBufferGeometry(this.gridLength, this.gridWidth);
-            geometry.rotateX(-Math.PI / 2);
-            const floor = new THREE.Mesh(
-                geometry,
-                new THREE.MeshBasicMaterial({
-                    visible: false, 
-                })
-            )
-            
+        const geometry = new THREE.PlaneBufferGeometry(this.gridLength, this.gridWidth);
+        geometry.rotateX(-Math.PI / 2);
+        const floor = new THREE.Mesh(
+            geometry,
+            new THREE.MeshBasicMaterial({
+                visible: false,
+            })
+        )
+
         this.importComplete(floor)
     };
 

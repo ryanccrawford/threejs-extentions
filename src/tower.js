@@ -11,7 +11,7 @@ class Tower25G extends THREE.Group {
     towerModel;
     towerHeight;
     towerTopCap;
-    towerBase ;
+    towerBase;
     towerSections;
     towerType;
     towerAccessories;
@@ -24,14 +24,14 @@ class Tower25G extends THREE.Group {
         super()
         this.towerModel = "25G"
         this.name = this.towerModel + " Tower";
-      this.towerSections = new THREE.Group();
-      this.towerSections.name = "Sections"
+        this.towerSections = new THREE.Group();
+        this.towerSections.name = "Sections"
     }
     onSectionLoaded = (part) => {
         console.log(part)
     }
     onTopCapLoaded = (part) => {
-         console.log(part)
+        console.log(part)
     }
     onBaseLoaded = (part) => {
         console.log(part)
@@ -40,11 +40,15 @@ class Tower25G extends THREE.Group {
     setParent = (parent) => {
         console.log(parent)
         this.parentRef = parent
-  this.towerTopCap = this.parentRef.topCapPart
-  this.towerTopCap.name = "Top Cap";
-  this.towerBase = this.parentRef.basePart
-  this.towerBase.name = "Base"
-  this.towerSection = this.parentRef.sectionPart;
+        this.towerTopCap = this.parentRef.topCapPart
+        this.towerTopCap.name = "Top Cap";
+        this.towerBase = this.parentRef.basePart
+        this.towerBase.name = "Base"
+        this.towerSection = this.parentRef.sectionPart;
+
+    }
+    addOrbitcontrols = (config = new OrbitConfig()) => {
+
 
     }
     changeHeight = (height) => {
@@ -56,7 +60,7 @@ class Tower25G extends THREE.Group {
             this.useSectionAsBase = true;
             this.towerBase = null;
         }
-console.log(this.towerSections)
+        console.log(this.towerSections)
         if (typeof this.towerSections !== 'undefined' && this.towerSections.children.length === numberOfSections) {
             this.towerBuild()
             return;
@@ -67,10 +71,10 @@ console.log(this.towerSections)
         let addHeight = 120;
         console.log(this)
         for (let i = 0; i < numberOfSections; i++) {
-                const newSection = this.towerSection.clone();
-                newSection.position.setY(nextMountHeight);
-                nextMountHeight += addHeight;
-                newGroup.add(newSection)
+            const newSection = this.towerSection.staticClone();
+            newSection.position.setY(nextMountHeight);
+            nextMountHeight += addHeight;
+            newGroup.add(newSection)
         }
         this.towerTopCapMountHeight = nextMountHeight;
         this.towerSections = newGroup;
@@ -78,39 +82,39 @@ console.log(this.towerSections)
     }
 
     changeBase = (base) => {
-        
-        if(!this.useSectionAsBase){
+
+        if (!this.useSectionAsBase) {
             this.towerBase = base;
-        }else if(this.useSectionAsBase){
+        } else if (this.useSectionAsBase) {
             this.towerBase = null;
         }
-        
+
     }
 
     changeTopCap = (topCap) => {
         this.towerTopCap = topCap
-       
+
     }
 
     towerBuild = () => {
 
         //this.children.length = 0;
-        if(this.towerSections.children.length > 0){
+        if (this.towerSections.children.length > 0) {
             this.add(this.towerSections)
         }
         if (this.towerTopCap.children.length > 0) {
             this.towerTopCap.position.setY(this.towerTopCapMountHeight)
             this.add(this.towerTopCap)
         }
-        
+
         if (this.towerBase.children.length > 0) {
             let baseHeight = this.towerBase.dimHeight
             let baseMountHeight = 0 - baseHeight;
             this.towerBase.position.setY(baseMountHeight)
             this.add(this.towerBase)
         }
-      
-            this.parentRef.scene.add(this)
+
+        //this.parentRef.scene.add(this)
 
     }
 

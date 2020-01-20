@@ -6,8 +6,9 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "webpack --watch",
-        "start": "webpack --progress --colors && nodemon ./server/server.js",
-        "build": "webpack"
+        "start": "webpack-dev-server --open && cd server & npm start",
+        "build": "webpack",
+        "install": "cd /server && npm install"
     },
     "repository": {
         "type": "git",

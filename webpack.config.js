@@ -8,29 +8,31 @@ const CopyPlugin = require("copy-webpack-plugin");
 module.exports = {
     mode: "development",
     entry: {
-        app: "./src/index.js",
-        // print: "./src/print.js",
-        // components: "./src/components.js",
-        // ToolIcon: "./src/toolicon.js",
-        // ToolBar: "./src/toolbar.js",
-        // Materials: "./src/materials.js",
-        // PartOptions: "./src/partbase.js",
-        // PartBase: "./src/partbase.js",
-        // RolloverPart: "./src/rolloverpart.js",
-        // Mpn25g: "./src/mpn25g.js",
-        // thebuilder: "./src/threedbuilder.js",
-        // APIData: "./src/databaseinterface.js",
-        // Mpn25ag5: "./src/mpn25ag5.js",
-        // MpnSb25g5: "./src/mpnsb25g5.js",
-        // FloorOptions: "./src/floor.js",
-        // Floor: "./src/floor.js",
-        // Tower25G: "./src/tower.js"
+        app: "./src/index.js"
+            // print: "./src/print.js",
+            // components: "./src/components.js",
+            // ToolIcon: "./src/toolicon.js",
+            // ToolBar: "./src/toolbar.js",
+            // Materials: "./src/materials.js",
+            // PartOptions: "./src/partbase.js",
+            // PartBase: "./src/partbase.js",
+            // RolloverPart: "./src/rolloverpart.js",
+            // Mpn25g: "./src/mpn25g.js",
+            // thebuilder: "./src/threedbuilder.js",
+            // APIData: "./src/databaseinterface.js",
+            // Mpn25ag5: "./src/mpn25ag5.js",
+            // MpnSb25g5: "./src/mpnsb25g5.js",
+            // FloorOptions: "./src/floor.js",
+            // Floor: "./src/floor.js",
+            // Tower25G: "./src/tower.js"
     },
     devtool: "inline-source-map",
     devServer: {
         contentBase: "./dist",
+        hot: true,
         host: "localhost", // Defaults to `localhost`
         port: 8080, // Defaults to 8080
+
         proxy: {
             "/api": {
                 target: "http://localhost:3000",
