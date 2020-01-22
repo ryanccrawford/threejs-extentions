@@ -104,7 +104,7 @@ const showHeightSelection = (box) => {
 
 const getHeightOption = () => {
     //TODO: Check to see which heights are avalible
-    let dataHeights = ["10", "20", "30", "40", "50", "60"];
+    let dataHeights = ["10", "20", "30", "35", "40"];
     let returnH = []
     let count = -1;
     for (let i = 0; i < dataHeights.length; i++) {
@@ -179,7 +179,7 @@ const doneCreatingOptions = () => {
 const onDataRetured = data => {
     //seiresOptions = data
     console.log(data)
-    seiresOptions.push({ name: "25G", id: 1, isSelected: false })
+    seiresOptions.push({ name: "25G Self-Supporting Tower", id: 1, isSelected: false })
     let label = "Select Tower Seires"
     seiresSelectBox = makeSelectBox("seires", "seires", label, onStart);
     seiresOptions.push({ name: label, id: 0, isSelected: true });

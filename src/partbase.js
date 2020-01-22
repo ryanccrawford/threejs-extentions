@@ -12,11 +12,14 @@ class PartBase extends THREE.Object3D {
     size;
     isImportComplete = false;
     readyCallback;
-
+    hadName = false;
 
     constructor(options) {
         super();
         this.name = options.name || "";
+        if(this.name){
+            this.hadName = true;
+        }
         this.material = options.material || null;
         this.importFile = options.importFile || "";
         if (options.readyCallback === null) {
@@ -55,18 +58,25 @@ class PartBase extends THREE.Object3D {
 
     fileImporter = () => {
         const binder = this;
+        let newName = "";
+        if(this.hadName){
+            newName = this.name
+        }
 
         if (!self.meshInMemory) {
-
+            
             this.loader.load(this.importFile, function(object) {
                 //object.rotateX(THREE.Math.degToRad(-90));
-
+                if(binder.hadName){
+                    object.name = newName
+                }
+               
                 object.traverse(function(child) {
                     if (child.isMesh) {
                         child.material = binder.material;
                     }
                 });
-                self.meshInMemory = object;
+                self.meshInMemory = object.clone(true);
                 binder.importComplete(object);
             });
         } else {
@@ -125,6 +135,7 @@ class PartBase extends THREE.Object3D {
     }
 
     staticClone = () => {
+        console.log(self.meshInMemory)
         return self.meshInMemory.clone(true);
     }
 }

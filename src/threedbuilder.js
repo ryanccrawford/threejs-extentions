@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import TowerCamera from './camera.js'
+import TowerLights from './lights.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { PartOptions, OrbitConfig } from "./partbase.js";
@@ -11,11 +13,13 @@ import Tower25 from "./tower.js"
 import Mpn25ag5 from './mpn25ag5.js';
 import MpnSb25g5 from './mpnsb25g5.js';
 import Tower25G from './tower.js';
+import Pad from './pad.js';
 
 class thebuilder {
     scene;
     floorRef;
     camera;
+    lights;
     renderer;
     objects = [];
     raycaster;
@@ -74,14 +78,7 @@ class thebuilder {
     }
 
     createCamera = () => {
-        this.camera = new THREE.PerspectiveCamera(
-            45,
-            this.width / this.height,
-            1,
-            10000
-        );
-        this.camera.position.set(0, 100, 600);
-        this.camera.lookAt(0, 0, 0);
+        this.camera = new TowerCamera(this.width, this.height);
         this.eventCameraReady();
     }
     eventCameraReady = () => {
@@ -113,18 +110,12 @@ class thebuilder {
         this.objects.push(this.floor);
     }
     createLights = () => {
-        const ambientLight = new THREE.AmbientLight(0x606060);
-        this.scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff);
-        directionalLight.position.set(1, 0.75, 0.5).normalize();
-        this.scene.add(directionalLight);
+        this.lights = new TowerLights();
+        this.scene.add(this.lights)
         this.eventLightsReady();
     }
     eventLightsReady = () => {
         this.createFloor();
-
-
     }
     createRenderer = () => {
         this.renderer = new THREE.WebGLRenderer({
@@ -137,10 +128,14 @@ class thebuilder {
     insertTower = (tower) => {
         if (this.tower === undefined) {
             this.tower = tower;
+        }else{
+            this.tower = null;
+            this.tower = tower
+
         }
 
         this.tower.setParent(this)
-        this.createDragingControls();
+        
         this.isTowerLoaded = true;
     }
     onRendererReady = () => {
@@ -149,9 +144,7 @@ class thebuilder {
             .appendChild(this.renderer.domElement);
         this.addEventListeners();
         this.createControls();
-       
-
-
+        this.createDragingControls();
         this.clock = new THREE.Clock();
 
 
@@ -190,6 +183,11 @@ class thebuilder {
         opt3.material = this.chrome;
         this.sectionPart = new Mpn25g(opt3)
             //this.documentRef.body.style.backgroundColor = "red";
+            const opt4 = new PartOptions();
+            opt4.material = new Materials().Concrete
+            const pad = new Pad(opt4);
+       
+        this.scene.add(pad);
         this.animate();
     }
 
@@ -238,7 +236,15 @@ class thebuilder {
 
     update = () => {
         this.updateMousePosition();
-
+        
+        if(this.scene.children[4]){
+            if(this.scene.children[4].children[0]){ 
+                document.getElementById('currentData').textContent = ("Current y:" +  this.scene.children[4].children[0].position.y)
+                document.getElementById('currentData2').textContent = ("Current x:" +  this.scene.children[4].children[0].position.x)
+                document.getElementById('currentData3').textContent = ("Current z:" +  this.scene.children[4].children[0].position.z)
+            }
+        }
+        
     }
 
     onResize = event => {
@@ -284,21 +290,29 @@ class thebuilder {
         const bonder = newTower
         newTower.children.forEach(function(child) {
             if (child.type === "Group") {
-               
-                    if (typeof child.createBoundingBox === "function") {
-                        let bb3 = child.createBoundingBox();
-                        bonder.add(bb3);
+               const bonder2 = bonder
+                child.traverse(function(object){
+                    
+                    if (typeof object.type === "Group") {
+                        let bb3 = object.createBoundingBox();
+                        bb3.geometry.center();
+                       // bonder2.add(bb3);
                     }
-
+                })
+                   
             } else {
                 if (typeof child.createBoundingBox === "function") {
                     let bb = child.createBoundingBox();
-                    bonder.add(bb);
+                    bb.geometry.center();
+                    //bonder.add(bb);
                 }
             }
 
         })
         //this.tower = newTower;
+        // this.towerTopCap.geometry.center();
+        // this.towerBase.geometry.center();
+        // this.towerSection.geometry.center();
          return newTower;
     }
 
@@ -317,7 +331,7 @@ class thebuilder {
         var direction = new THREE.Vector3( 10, 0, 0 );
         direction.normalize();
     
-        var distance = 100; // at what distance to determine pointB
+        var distance = 1000; // at what distance to determine pointB
     
         var pointB = new THREE.Vector3();
         pointB.addVectors ( pointA, direction.multiplyScalar( distance ) );
