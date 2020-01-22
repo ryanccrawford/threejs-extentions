@@ -144,7 +144,7 @@ class thebuilder {
             .appendChild(this.renderer.domElement);
         this.addEventListeners();
         this.createControls();
-        this.createDragingControls();
+        //this.createDragingControls();
         this.clock = new THREE.Clock();
 
 
