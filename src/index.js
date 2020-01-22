@@ -10,7 +10,7 @@ import ToolIcon from "./toolicon.js";
 import ToolBar from "./toolbar.js";
 import Tower25G from "./tower.js";
 var tower;
-
+var mode = "development";
 const Thebuilder = new thebuilder();
 
 function pageContainer() {
