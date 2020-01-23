@@ -46,7 +46,7 @@ class thebuilder {
     timesRemoved = 0;
     lastIntersecpted;
     lastIntersecptedMaterial;
-
+    line;
 
     constructor() {
         this.components = new components();
@@ -128,20 +128,25 @@ class thebuilder {
     insertTower = (tower) => {
         if (this.tower === undefined) {
             this.tower = tower;
-        }else{
+        } else {
             this.tower = null;
             this.tower = tower
 
         }
 
         this.tower.setParent(this)
-        
+
         this.isTowerLoaded = true;
     }
     onRendererReady = () => {
         document
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
+        var material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+        var geometry = new THREE.Geometry();
+        this.line = new THREE.Line(geometry, material);
+        this.line.material = material
+        this.scene.add(this.line);
         this.addEventListeners();
         this.createControls();
         //this.createDragingControls();
@@ -162,7 +167,7 @@ class thebuilder {
     }
     createDragingControls = () => {
         this.draggingControls = new DragControls(this.scene.children, this.camera, this.renderer.domElement);
-        
+
     }
     attach = (documentRef) => {
 
@@ -183,10 +188,10 @@ class thebuilder {
         opt3.material = this.chrome;
         this.sectionPart = new Mpn25g(opt3)
             //this.documentRef.body.style.backgroundColor = "red";
-            const opt4 = new PartOptions();
-            opt4.material = new Materials().Concrete
-            const pad = new Pad(opt4);
-       
+        const opt4 = new PartOptions();
+        opt4.material = new Materials().Concrete
+        const pad = new Pad(opt4);
+
         this.scene.add(pad);
         this.animate();
     }
@@ -216,9 +221,9 @@ class thebuilder {
         requestAnimationFrame(this.animate);
     };
 
-   
+
     updateMousePosition = () => {
-        if(this.controls){
+        if (this.controls) {
             const newMouseDisplay = this.components.mousePosition(
                 this.mouse.x,
                 this.controls.getPolarAngle(),
@@ -230,21 +235,21 @@ class thebuilder {
     };
 
     render = () => {
-    
+
         this.renderer.render(this.scene, this.camera);
     }
 
     update = () => {
         this.updateMousePosition();
-        
-        if(this.scene.children[4]){
-            if(this.scene.children[4].children[0]){ 
-                document.getElementById('currentData').textContent = ("Current y:" +  this.scene.children[4].children[0].position.y)
-                document.getElementById('currentData2').textContent = ("Current x:" +  this.scene.children[4].children[0].position.x)
-                document.getElementById('currentData3').textContent = ("Current z:" +  this.scene.children[4].children[0].position.z)
+
+        if (this.scene.children[4]) {
+            if (this.scene.children[4].children[0]) {
+                document.getElementById('currentData').textContent = ("Current y:" + this.scene.children[4].children[0].position.y)
+                document.getElementById('currentData2').textContent = ("Current x:" + this.scene.children[4].children[0].position.x)
+                document.getElementById('currentData3').textContent = ("Current z:" + this.scene.children[4].children[0].position.z)
             }
         }
-        
+
     }
 
     onResize = event => {
@@ -263,24 +268,45 @@ class thebuilder {
 
         const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.53;
         const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
-
         this.mouse.set(x, y);
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        let intersects = this.raycaster.intersectObjects(this.scene.children);
+        if (intersects.length > 0) {
+            const intercept = intersects[0];
+            const pointA = this.camera.position
 
 
+
+            let direction = new THREE.Vector3();
+            this.camera.getWorldDirection(direction);
+            direction.normalize();
+
+
+
+            let pointB = intercept.point;
+
+            let distance = pointA.distanceTo(intercept.point);
+            pointB.addVectors(pointA, direction.multiplyScalar(distance));
+
+            this.line.geometry.vertices.push(pointA);
+            this.line.geometry.vertices.push(pointB);
+
+        }
     }
 
     changeTowerHeight = (height) => {
         //   let ob = this.scene.getObjectsByName(this.tower.name)
         //   this.scene.remove(ob)
         const newTower = new Tower25G();
-  
-        
-        if(this.timesRemoved > 0){
+
+
+        if (this.timesRemoved > 0) {
             this.scene.remove(this.tower);
         }
         this.timesRemoved++
-        
-        const top = this.topCapPart //.clone();
+
+            const top = this.topCapPart //.clone();
         const base = this.basePart //.clone();
         const section = this.sectionPart
         newTower.changeBase(base);
@@ -289,67 +315,44 @@ class thebuilder {
         newTower.towerBuild();
         const bonder = newTower
         newTower.children.forEach(function(child) {
-            if (child.type === "Group") {
-               const bonder2 = bonder
-                child.traverse(function(object){
-                    
-                    if (typeof object.type === "Group") {
-                        let bb3 = object.createBoundingBox();
-                        bb3.geometry.center();
-                       // bonder2.add(bb3);
-                    }
-                })
-                   
-            } else {
-                if (typeof child.createBoundingBox === "function") {
-                    let bb = child.createBoundingBox();
-                    bb.geometry.center();
-                    //bonder.add(bb);
-                }
-            }
+                if (child.type === "Group") {
+                    const bonder2 = bonder
+                    child.traverse(function(object) {
 
-        })
-        //this.tower = newTower;
-        // this.towerTopCap.geometry.center();
-        // this.towerBase.geometry.center();
-        // this.towerSection.geometry.center();
-         return newTower;
+                        if (typeof object.type === "Group") {
+                            let bb3 = object.createBoundingBox();
+                            bb3.geometry.center();
+                            // bonder2.add(bb3);
+                        }
+                    })
+
+                } else {
+                    if (typeof child.createBoundingBox === "function") {
+                        let bb = child.createBoundingBox();
+                        bb.geometry.center();
+                        //bonder.add(bb);
+                    }
+                }
+
+            })
+            //this.tower = newTower;
+            // this.towerTopCap.geometry.center();
+            // this.towerBase.geometry.center();
+            // this.towerSection.geometry.center();
+        return newTower;
     }
 
 
     onDocumentMouseDown = event => {
-        event.preventDefault();
 
-        const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.53;
-        const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
-
-        this.mouse.set(x, y);
-
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-
-        var pointA = new THREE.Vector3( 0, 0, 0 );
-        var direction = new THREE.Vector3( 10, 0, 0 );
-        direction.normalize();
-    
-        var distance = 1000; // at what distance to determine pointB
-    
-        var pointB = new THREE.Vector3();
-        pointB.addVectors ( pointA, direction.multiplyScalar( distance ) );
-    
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push( pointA );
-        geometry.vertices.push( pointB );
-        var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
-        var line = new THREE.Line( geometry, material );
-        this.scene.add( line );
 
         const intersects = this.raycaster.intersectObjects(this.scene.children);
 
         if (intersects.length > 0) {
             const intersect = intersects[0];
-            if( intersect.object != this.lastIntersecpted){
+            if (intersect.object != this.lastIntersecpted) {
 
-                if(this.lastIntersecpted){
+                if (this.lastIntersecpted) {
                     console.log(this.lastIntersecpted)
                     this.lastIntersecpted.material.color.setHex(this.lastIntersecpted.currentHex);
                     this.lastIntersecpted = intersect.object
@@ -357,13 +360,13 @@ class thebuilder {
                     this.lastIntersecpted.material.color.setHex("#023300");
                 }
             }
-            
-        }else{
-            if(this.lastIntersecpted){
+
+        } else {
+            if (this.lastIntersecpted) {
                 this.lastIntersecpted.material.color.setHex(this.lastIntersecpted.currentHex);
                 this.lastIntersecpted = null;
             }
         }
-}
+    }
 }
 export default thebuilder;

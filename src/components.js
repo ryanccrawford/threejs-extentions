@@ -10,7 +10,24 @@ class components {
         jumbotron.className = "jumbotron";
         return jumbotron;
     };
+    appBar = () => {
 
+        //       <nav class="navbar navbar-light bg-light">
+        //   <a class="navbar-brand" href="#">
+        //     <img src="/docs/4.3/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+        //     Bootstrap
+        //   </a>
+        // </nav>
+        const nav = document.createElement("nav");
+
+        nav.className = "navbar navbar - light bg - light";
+        nav.id = "nav"
+        const title = document.createElement("span");
+        title.className = "navbar-brand";
+        title.innerHTML = "3 Star"
+        nav.appendChild(title);
+        return nav;
+    };
     display4 = (text, options = null) => {
         let display = document.createElement("h1");
         display.className = "display-4";
@@ -42,7 +59,7 @@ class components {
         if (onClick) {
             button.addEventListener("click", onClick);
         }
-      
+
         return button;
     };
 
@@ -96,7 +113,7 @@ class components {
     };
     partPosition = (lines = [], id = null) => {
         const div = document.createElement("div");
-        let newId = id !== null ? id.replace(" ", "").toLowerCase() : null
+        let newId = id !== null ? id.replace(" ", "").toLowerCase() : null;
 
         let len = lines.length;
 
@@ -186,12 +203,9 @@ class components {
     };
 
     replaceElement = (elementIdToReplace, element) => {
-        const elementBeingReplace = document.getElementById(elementIdToReplace)
-        
-        elementBeingReplace.parentNode.replaceChild(
-            element,
-            elementBeingReplace
-        );
+        const elementBeingReplace = document.getElementById(elementIdToReplace);
+
+        elementBeingReplace.parentNode.replaceChild(element, elementBeingReplace);
     };
 };
 

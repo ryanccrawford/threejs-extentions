@@ -25,9 +25,10 @@ function topContainer() {
 
 function titleBar() {
     const Components = new components();
-    const jumbo = Components.jumbotron();
-    const text = Components.display4('3 Star - 3D Tower Builder');
-    jumbo.appendChild(text);
+    const jumbo = Components.appBar();
+    // const text = Components.display4('3 Star - 3D Tower Builder');
+    // jumbo.appendChild(text);
+    // return jumbo;
     return jumbo;
 }
 
@@ -229,7 +230,7 @@ if (module.hot) {
     });
 }
 const theWidth = renderarea.clientWidth;
-const usedSpace = document.getElementsByClassName('jumbotron')[0].clientHeight + 150;
+const usedSpace = document.getElementById('nav').clientHeight + 150;
 const theHeight = window.screen.availHeight - usedSpace;
 Thebuilder.setHeight(theHeight)
 Thebuilder.setWidth(theWidth)
