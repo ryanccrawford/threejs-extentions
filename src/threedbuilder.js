@@ -190,6 +190,7 @@ class thebuilder {
             //this.documentRef.body.style.backgroundColor = "red";
         const opt4 = new PartOptions();
         opt4.material = new Materials().Concrete
+        opt4.secondMaterial = {material: new Materials().SandGravel, what: "Drainage Bed"}
         const pad = new Pad(opt4);
 
         this.scene.add(pad);

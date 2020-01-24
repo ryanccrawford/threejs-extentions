@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 class TowerCamera extends THREE.PerspectiveCamera {
 
-    constructor(width, height){
+    constructor(width, height) {
         super(25,
             width / height,
             1,

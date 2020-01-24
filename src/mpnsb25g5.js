@@ -20,6 +20,9 @@ class MpnSb25g5 extends PartBase {
 		opt.name = "SB25G5"
 		
 		super(opt);
+	//	this.position.setX(0);
+	//	this.position.setY(-51.599);
+		
 	}
 
 

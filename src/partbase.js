@@ -13,6 +13,7 @@ class PartBase extends THREE.Object3D {
     isImportComplete = false;
     readyCallback;
     hadName = false;
+    secondMaterial;
 
     constructor(options) {
         super();
@@ -32,6 +33,7 @@ class PartBase extends THREE.Object3D {
             return;
         }
         this.loader = new FBXLoader();
+        this.secondMaterial = options.secondMaterial;
         this.getPart();
 
     }
@@ -48,6 +50,21 @@ class PartBase extends THREE.Object3D {
         this.dimWidth = this.getWidth();
         this.dimLength = this.getLength();
         this.isImportComplete = true;
+        if(typeof this.secondMaterial === 'object'){
+            const bind = this;
+                 bind.traverse(function(item){
+                    console.log(item)
+                    if(item.name.includes("Drainage_Bed1")){
+                        const binddeep2 = bind;
+                        item.traverse(function(child){
+                            window.console.log(child)
+                            child.material = binddeep2.secondMaterial.material
+                        })
+                       
+                    }
+                })
+        }
+
         if (this.readyCallback === null) {
             return;
         } else {
@@ -145,6 +162,7 @@ class PartOptions {
     material;
     importFile;
     readyCallback;
+    secondMaterial;
 }
 
 class OrbitConfig {
