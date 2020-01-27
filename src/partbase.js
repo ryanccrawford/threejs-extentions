@@ -18,7 +18,7 @@ class PartBase extends THREE.Object3D {
     constructor(options) {
         super();
         this.name = options.name || "";
-        if(this.name){
+        if (this.name) {
             this.hadName = true;
         }
         this.material = options.material || null;
@@ -50,22 +50,22 @@ class PartBase extends THREE.Object3D {
         this.dimWidth = this.getWidth();
         this.dimLength = this.getLength();
         this.isImportComplete = true;
-        if(typeof this.secondMaterial === 'object'){
+        if (typeof this.secondMaterial === 'object') {
             const bind = this;
-                 bind.traverse(function(item){
-                    console.log(item)
-                    if(item.name.includes("Drainage_Bed1")){
-                        const binddeep2 = bind;
-                        item.traverse(function(child){
-                            window.console.log(child)
-                            child.material = binddeep2.secondMaterial.material
-                        })
-                       
-                    }
-                })
+            bind.traverse(function(item) {
+                console.log(item)
+                if (item.name.includes("Drainage_Bed1")) {
+                    const binddeep2 = bind;
+                    item.traverse(function(child) {
+                        window.console.log(child)
+                        child.material = binddeep2.secondMaterial.material
+                    })
+
+                }
+            })
         }
 
-        if (this.readyCallback === null) {
+        if (typeof this.readyCallback === 'undefined' || this.readyCallback === null) {
             return;
         } else {
             this.readyCallback(part);
@@ -76,28 +76,28 @@ class PartBase extends THREE.Object3D {
     fileImporter = () => {
         const binder = this;
         let newName = "";
-        if(this.hadName){
+        if (this.hadName) {
             newName = this.name
         }
 
         if (!self.meshInMemory) {
-            
+
             this.loader.load(this.importFile, function(object) {
                 //object.rotateX(THREE.Math.degToRad(-90));
-                if(binder.hadName){
+                if (binder.hadName) {
                     object.name = newName
                 }
-               
+
                 object.traverse(function(child) {
                     if (child.isMesh) {
                         child.material = binder.material;
                     }
                 });
-                self.meshInMemory = object.clone(true);
+                self.meshInMemory = object.clone();
                 binder.importComplete(object);
             });
         } else {
-            const mesh = this.clone();
+            const mesh = self.meshInMemory.clone();
             mesh.traverse(function(child) {
                 if (child.isMesh) {
                     child.material = binder.material;

@@ -126,30 +126,30 @@ const onStart = event => {
     //itemSelected.selected = true;
     console.log(itemSelected.textContent);
     //setModel(itemSelected.textContent);
-    
-    if(!document.getElementById('height')){
-            const heightOptions = getHeightOption()
 
-            let label = "Select Tower Height"
-            heightOptions.push({ id: 0, name: label, isSelected: true })
-            const heightSelectBox = makeSelectBox("height", "height", label, onHeightSelect);
+    if (!document.getElementById('height')) {
+        const heightOptions = getHeightOption()
 
-            for (let i = 0; i < heightOptions.length; i++) {
-                const opt = document.createElement("option");
-                const textNode = document.createTextNode(heightOptions[i].name)
-                opt.appendChild(textNode);
-                opt.value = heightOptions[i].id.toString()
-                opt.selected = heightOptions[i].isSelected;
-                heightSelectBox.appendChild(opt);
-            }
+        let label = "Select Tower Height"
+        heightOptions.push({ id: 0, name: label, isSelected: true })
+        const heightSelectBox = makeSelectBox("height", "height", label, onHeightSelect);
+
+        for (let i = 0; i < heightOptions.length; i++) {
+            const opt = document.createElement("option");
+            const textNode = document.createTextNode(heightOptions[i].name)
+            opt.appendChild(textNode);
+            opt.value = heightOptions[i].id.toString()
+            opt.selected = heightOptions[i].isSelected;
+            heightSelectBox.appendChild(opt);
+        }
 
 
-            showHeightSelection(heightSelectBox);
+        showHeightSelection(heightSelectBox);
     }
 }
 
 const getBaseOptions = () => {
-    
+
     let dataBases = ["Concrete Base Plate 25GSSB", "5' Short Base SB25G5", "Hinged Short Base SBH25G"];
     let returnH = []
     let count = -1;
@@ -166,23 +166,28 @@ const onHeightSelect = event => {
 
     const itemSelected = parseInt(event.target.selectedOptions[0].text);
     if (typeof Thebuilder.tower === 'undefined') {
-        Thebuilder.insertTower(tower)
+        Thebuilder.insertTower(tower);
+
     }
+    // if (typeof Thebuilder.tower.parentRef === "undefined") {
+    //     tower.setParent(Thebuilder);
+    // }
+    tower.setTowerHeight(itemSelected);
+    const ttower = tower.createTower();
+    ttower.children.forEach(function(child) {
+        Thebuilder.scene.add(child);
+    });
 
-    const towerToAdd = Thebuilder.changeTowerHeight(itemSelected);
-    // Thebuilder.tower.towerBuild();
-    Thebuilder.tower = towerToAdd
-    Thebuilder.scene.add(towerToAdd)
 
-    if(!document.getElementById('base')){
+    if (!document.getElementById('base')) {
         const baseOptions = getBaseOptions()
-        const baseSelect = bindOptions( baseOptions, makeBaseSelect());
-    
-   
+        const baseSelect = bindOptions(baseOptions, makeBaseSelect());
+
+
         towerSelect.getElementsByClassName("card-body")[0].appendChild(baseSelect)
     }
 
-    
+
 
 }
 
@@ -199,33 +204,33 @@ const bindOptions = (options, htmlSelectBox) => {
     return htmlSelectBox
 }
 
-const onBaseSelect = (event)=> {
+const onBaseSelect = (event) => {
     event.preventDefault();
 
     const itemSelected = event.target.selectedOptions[0].text;
     if (typeof Thebuilder.tower !== 'undefined') {
-      const opt = new PartOptions();
-      opt.material = new Materials().ShinnyChrome;
+        const opt = new PartOptions();
+        opt.material = new Materials().ShinnyChrome;
 
-        if(itemSelected.includes("25GSSB")){
+        if (itemSelected.includes("25GSSB")) {
 
-           Thebuilder.tower.changeBase("25GSSB");
+            Thebuilder.tower.changeBase("25GSSB");
 
         }
-        if(itemSelected.includes("SB25G5")){
+        if (itemSelected.includes("SB25G5")) {
             Thebuilder.tower.changeBase("SB25G5");
 
         }
-        if(itemSelected.includes("SBH25G")){
+        if (itemSelected.includes("SBH25G")) {
             Thebuilder.tower.changeBase("SBH25G");
-        
+
         }
 
     }
-    
+
 }
 
-const onTopCapSelect = (event)=> {
+const onTopCapSelect = (event) => {
 
 
 }
@@ -244,14 +249,16 @@ function makeTowerSelect() {
     const card = Components.card("", "Tower Selection", null)
     return card;
 }
+
 function makeBaseSelect() {
-    
-    const baseSelect = makeSelectBox('base','base','Select Base (Optional)', onBaseSelect)
+
+    const baseSelect = makeSelectBox('base', 'base', 'Select Base (Optional)', onBaseSelect)
     return baseSelect;
 }
+
 function makeTopCapSelect() {
-   
-    const topCapSelect = makeSelectBox('topcap','topcap','Select Top Cap (Optional)', onTopCapSelect)
+
+    const topCapSelect = makeSelectBox('topcap', 'topcap', 'Select Top Cap (Optional)', onTopCapSelect)
     return topCapSelect;
 }
 
@@ -304,12 +311,12 @@ pageBody.appendChild(top);
 pageBody.appendChild(bottom)
 
 document.body.appendChild(pageBody);
-if (module.hot) {
-    module.hot.accept('./threedbuilder.js', function() {
-        console.log("Accepting the updated threedbuilder module!");
-        printMe();
-    });
-}
+// if (module.hot) {
+//     module.hot.accept('./threedbuilder.js', function() {
+//         console.log("Accepting the updated threedbuilder module!");
+//         printMe();
+//     });
+// }
 const theWidth = renderarea.clientWidth;
 const usedSpace = document.getElementById('nav').clientHeight + 150;
 const theHeight = window.screen.availHeight - usedSpace;
