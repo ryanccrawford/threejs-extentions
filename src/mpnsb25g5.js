@@ -16,7 +16,9 @@ class MpnSb25g5 extends PartBase {
 			opt = options
 		}
 		opt.importFile = 'assets/3dmodels/SB25G5.fbx'
-		
+		if(!opt.material){
+			opt.material = new Materials().ShinnyChrome;
+		}
 		opt.name = "SB25G5"
 		
 		super(opt);

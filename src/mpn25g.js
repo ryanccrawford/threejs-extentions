@@ -12,6 +12,9 @@ class Mpn25g extends PartBase {
 		} else {
 			opt = options;
 		}
+		if(!opt.material){
+			opt.material = new Materials().ShinnyChrome;
+		}
 		opt.importFile = 'assets/3dmodels/25G.fbx'
 	
 		opt.name = "25G"

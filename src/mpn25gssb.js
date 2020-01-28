@@ -16,7 +16,9 @@ class Mpn25gssb extends PartBase {
 				opt = options;
 			}
 		opt.importFile = 'assets/3dmodels/25GSSB.fbx'
-	
+		if(!opt.material){
+			opt.material = new Materials().ShinnyChrome;
+		}
 
 		opt.name = "25GSSB"
 	

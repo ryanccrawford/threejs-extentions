@@ -9,10 +9,9 @@ import { RolloverPart } from "./rolloverpart.js";
 import components from "./components.js";
 import Materials from "./materials.js";
 import { Floor, FloorOptions } from "./floor.js";
-import Tower25 from "./tower.js"
+import Tower25G from "./tower.js"
 import Mpn25ag5 from './mpn25ag5.js';
 import MpnSb25g5 from './mpnsb25g5.js';
-import Tower25G from './tower.js';
 import Pad from './pad.js';
 
 class Thebuilder {
@@ -49,6 +48,11 @@ class Thebuilder {
     lastIntersecptedMaterial;
     line;
     towerReady = false;
+    animationFrameId;
+    selectedBase = "SB25G5"
+    selectedTopCap = "25AG3"
+    towerHeight = 10;
+
     constructor() {
         this.components = new components();
         this.raycaster = new THREE.Raycaster();
@@ -183,7 +187,7 @@ class Thebuilder {
         const pad = new Pad(opt4);
 
         this.scene.add(pad);
-        this.render();
+        this.animate();
     };
 
     addEventListeners = () => {
@@ -201,14 +205,10 @@ class Thebuilder {
     };
 
     animate = () => {
-            
-                this.render();
-            
-        
-            this.update();
-           
-        requestAnimationFrame(this.animate);
-    };
+        this.animationFrameId = requestAnimationFrame( this.animate );    
+        this.renderer.render(this.scene, this.camera);
+        this.update();
+    }
 
     updateMousePosition = () => {
         if (!this.isPaused) {
@@ -222,28 +222,22 @@ class Thebuilder {
                 this.components.replaceElement("mouse", newMouseDisplay);
             }
         }
-    };
-
-    render = () => {
-        if(this.towerReady){
-            this.renderer.render(this.scene, this.camera);
-        }
-    };
+    }
 
     update = () => {
-        //this.updateMousePosition();
+        this.updateMousePosition();
 
-        // if (this.scene.children[4]) {
-        //     if (this.scene.children[4].children[0]) {
-        //         document.getElementById("currentData").textContent =
-        //             "Current y:" + this.scene.children[4].children[0].position.y;
-        //         document.getElementById("currentData2").textContent =
-        //             "Current x:" + this.scene.children[4].children[0].position.x;
-        //         document.getElementById("currentData3").textContent =
-        //             "Current z:" + this.scene.children[4].children[0].position.z;
-        //     }
-        // }
-    };
+        if (this.scene.children[4]) {
+            if (this.scene.children[4].children[0]) {
+                document.getElementById("currentData").textContent =
+                    "Current y:" + this.scene.children[4].children[0].position.y;
+                document.getElementById("currentData2").textContent =
+                    "Current x:" + this.scene.children[4].children[0].position.x;
+                document.getElementById("currentData3").textContent =
+                    "Current z:" + this.scene.children[4].children[0].position.z;
+            }
+        }
+    }
 
     onResize = event => {
         event.preventDefault();
@@ -254,7 +248,7 @@ class Thebuilder {
         canvas.width = this.width;
         this.renderer.setSize(this.width, this.height);
         this.camera.updateProjectionMatrix();
-    };
+    }
 
     onDocumentMouseMove = event => {
         event.preventDefault();
@@ -315,95 +309,112 @@ class Thebuilder {
             }
         }
     };
-    createTower = (baseType = "SB25G5", topCapType = "25AG3", numberOfSections = 1) => {
+   
+    onHeightSelect = event => {
+        event.preventDefault();
       
-
-        for (var key in this.tower.towerParts.towerBases) {
-            if(key.name === baseType){
-                this.tower.towerParts.towerBase = key.part.clone();
-            }
+        const itemSelected = parseInt(event.target.selectedOptions[0].text);
+        if (typeof this.tower === 'undefined') {
+            this.tower = new Tower25G();
         }
-        for (var key in  this.tower.towerParts.towerTopCaps) {
-            if(key.name === topCapType){
-                this.tower.towerParts.towerTopCap = key.part.clone();
-            }
-        }
-        
-        let baseHeight = this.tower.towerParts.towerBase.getHeight() - 12;
-
-        if (this.tower.towerParts.towerSections.children.length > 0) {
-
-            this.tower.add(this.tower.towerParts.towerSections)
-        }
-        if (this.tower.towerParts.towerTopCap.children.length > 0) {
-            if (this.tower.towerParts.towerSections.children.length === 0) {
-                this.tower.towerParts.towerTopCap.position.setY(this.tower.sectionsHeight)
-            } else {
-                this.tower.sectionsHeight = this.tower.towerTopCapMountHeight;
-                this.tower.towerParts.towerTopCap.position.setY(this.tower.sectionsHeight)
-            }
-            this.tower.towerParts.towerTopCap.position.setX(0.24)
-            this.tower.towerParts.towerTopCap.position.setZ(0.367)
-            this.tower.towerParts.towerTopCap.position.setY(this.tower.towerParts.towerTopCap.position.y - 2.122)
-            this.tower.add(this.tower.towerParts.towerTopCap)
-        }
-
-        if (this.tower.towerParts.towerBase.children.length > 0) {
-            this.tower.towerParts.towerBase.position.setY(-(baseHeight))
-            this.tower.add(this.tower.towerParts.towerBase)
+        if(this.towerHeight != parseInt(itemSelected)){
+            this.towerHeight = parseInt(itemSelected)
+            cancelAnimationFrame(this.animationFrameId)
+            this.updateTower()
         }
        
-            // this.translate(0,0,0);
-            // this.position.copy(new THREE.Vector3(0, 0, 0.0));
-            // const box = new THREE.Box3().setFromObject( this );
-            //   box.getCenter( this.parentRef.getObjectByName("Pad") ); // this re-sets the obj position
         
+        if (!document.getElementById('base')) {
+            const baseOptions = this.getBaseOptions()
+            const baseSelect = this.bindOptions(baseOptions, this.makeBaseSelect());
+    
+    
+            document.towerSelect.getElementsByClassName("card-body")[0].appendChild(baseSelect)
+        }
+      
+    
+    }
+    updateTower = () => {
+
+      
+        this.tower.setTowerBase(this.selectedBase);
+        this.tower.setTowerTopCap(this.selectedTopCap);
+        this.tower.setTowerHeight(this.towerHeight);
+        this.tower.createTower();
+        this.scene.add(this.tower.get3DTowerObject());
+
+        this.animate();
 
     }
-    setTowerHeight = (height) => {
-        this.tower.reset();
 
-        this.tower.useSectionAsBase = false;
-        this.tower.towerHeight = parseInt(height);
-        this.tower.sectionsHeight = 0.0
-        
-        let numberOfSections = parseInt((this.tower.towerHeight / 10) - 1);
-        if ((this.tower.towerHeight.toString()[1] === 5)) {
-            this.tower.useSectionAsBase = true;
-         
-            this.tower.towerParts.towerBase = new THREE.Object3D();
-
-        }
-
-        
-
-        // const newGroup = new THREE.Group();
-        // newGroup.position.setX(-2.62)
-        // newGroup.position.setY(0.64)
-        // newGroup.position.setZ(17.99)
-
-        // newGroup.name = "Sections";
-        let nextMountHeight = -6;
-        if (this.tower.useSectionAsBase) {
-            nextMountHeight = -5
-        }
-
-        //this.towerParts.towerSections.children.splice(0)
-        let addHeight = this.tower.towerParts.towerSection.getHeight() - 2.25;
-     
-        
-        for (let i = 0; i < numberOfSections; i++) {
-            const newSection = this.tower.towerParts.towerSection.clone();
-            newSection.position.setY(nextMountHeight);
-            nextMountHeight += (addHeight);
-
-            this.tower.towerParts.towerSections.add(newSection);
-        }
-        this.tower.towerTopCapMountHeight = nextMountHeight;
-
-     
-
+    makeSelectBox = (id, name, label, onSelectionEvent) => {
+        const Components = new components();
+        return Components.selectBox(id, name, label, onSelectionEvent)
     }
+
+    makeBaseSelect = () => {
+
+        const baseSelect = this.makeSelectBox('base', 'base', 'Select Base (Optional)', onBaseSelect)
+        return baseSelect;
+    }
+    
+    makeTopCapSelect = () => {
+    
+        const topCapSelect = this.makeSelectBox('topcap', 'topcap', 'Select Top Cap (Optional)', onTopCapSelect)
+        return topCapSelect;
+    }
+
+    getBaseOptions = () => {
+
+        let dataBases = ["Concrete Base Plate 25GSSB", "5' Short Base SB25G5", "Hinged Short Base SBH25G"];
+        let returnH = []
+        let count = -1;
+        for (let i = 0; i < dataBases.length; i++) {
+         returnH.push({ name: dataBases[i], id: ++count, isSelected: count === 0 ? true : false });
+        }
+        return returnH
+    }
+    
+    
+    
+    
+    bindOptions = (options, htmlSelectBox) => {
+    
+        for (let i = 0; i < options.length; i++) {
+            const opt = document.createElement("option");
+            const textNode = document.createTextNode(options[i].name)
+            opt.appendChild(textNode);
+            opt.value = options[i].id.toString()
+            opt.selected = options[i].isSelected;
+            htmlSelectBox.appendChild(opt);
+        }
+        return htmlSelectBox
+    }
+    
+    onBaseSelect = (event) => {
+        event.preventDefault();
+    
+        const itemSelected = event.target.selectedOptions[0].text;
+        if (typeof this.tower !== 'undefined') {
+            cancelAnimationFrame(this.animationFrameId)
+            this.selectedBase = itemSelected
+            this.updateTower()
+        }
+    
+    }
+    
+    onTopCapSelect = (event) => {
+        event.preventDefault();
+    
+        const itemSelected = event.target.selectedOptions[0].text;
+        if (typeof this.tower !== 'undefined') {
+            cancelAnimationFrame(this.animationFrameId)
+            this.selectedTopCap = itemSelected
+            this.updateTower()
+        }
+    
+    }
+    
 
 }
 export default Thebuilder;

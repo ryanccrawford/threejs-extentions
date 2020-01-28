@@ -16,7 +16,9 @@ class Mpn25ag5 extends PartBase {
 				opt = options;
 			}
 		opt.importFile = 'assets/3dmodels/25AG5.fbx'
-		
+		if(!opt.material){
+			opt.material = new Materials().ShinnyChrome;
+		}
 
 		opt.name = "25AG5"
 	

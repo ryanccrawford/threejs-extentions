@@ -1,4 +1,3 @@
-import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import Mpn25g from "./mpn25g.js";
 import Mpn25ag5 from "./mpn25ag5.js";
 import Mpn25ag4 from "./mpn25ag4.js";
@@ -6,12 +5,9 @@ import Mpn25ag3 from "./mpn25ag3.js";
 import MpnSb25g5 from "./mpnsb25g5.js";
 import Mpn25gssb from "./mpn25gssb.js";
 import MpnSbh25g from "./mpnsbh25g.js";
-import { PartOptions } from "./partbase.js";
 import * as THREE from "three";
-import Materials from "./materials.js";
 
-
-class Tower25G extends THREE.Group {
+class Tower25G {
     renderCanRun = false;
     towerModel;
     towerHeight;
@@ -19,13 +15,12 @@ class Tower25G extends THREE.Group {
     towerTopCapMountHeight;
     useSectionAsBase = false;
     sectionsHeight = 0.00;
+    object3DTower;
 
     constructor() {
-        super()
-      
+        this.object3DTower = new THREE.Group();
         this.towerModel = "25G"
         this.name = this.towerModel + " Tower";
-        this.towerParts.towerMaterial = new Materials().ShinnyChrome;
         this.towerParts.towerSection = new Mpn25g();
         const base25GSSB = "25GSSB";
         const baseSB25G5 = "SB25G5";
@@ -67,20 +62,114 @@ class Tower25G extends THREE.Group {
                 part: new Mpn25ag5()
             }
         ]
-        console.log(this)
+        
        this.reset();
     }
     reset = () => {
-
-        this.towerParts.towerBase = this.towerParts.towerBases[0].part
+        this.setTowerBase("SB25G5");
+        this.setTowerTopCap("25AG3");
         this.towerParts.towerSections = new THREE.Group();
         this.towerParts.towerSections.name = "Sections"
-        this.towerParts.towerSections.add(this.towerParts.towerSection.clone())
-        this.towerParts.towerTopCap = this.towerParts.towerTopCaps[2].part
+        this.towerParts.towerTopCap = new THREE.Object3D();
+    }
+    get3DTowerObject = () => {
+
+        return this.object3DTower.clone()
+    }
+    getPart = (name, clone = true) => {
+
+        for (let index in this.towerParts.towerBases) {
+            if(this.towerParts.towerBases[parseInt(index)].name === name){
+               if(clone){
+                    return this.towerParts.towerBases[parseInt(index)].part.clone();
+               }else{
+                    return this.towerParts.towerBases[parseInt(index)].part
+               }
+                
+            }
+        }
+
+        for (let indexTop in this.towerParts.towerTopCaps) {
+
+            if(this.towerParts.towerTopCaps[parseInt(indexTop)].name === name){
+                if(clone){
+                    return this.towerParts.towerTopCaps[parseInt(indexTop)].part.clone();
+                   }else{
+                    return this.towerParts.towerTopCaps[parseInt(indexTop)].part
+                   }
+            }
+        }
+
+        throw "Error, could not find part named " + name;
+    }
+    createTower = () => {
+      
+        this.object3DTower = new THRRE.Group()
         
+        let baseHeight = this.towerParts.towerBase.getHeight() - 12;
+
+        if (this.towerParts.towerSections.children.length > 0) {
+
+            this.object3DTower.add(this.towerParts.towerSections)
+        }
+        if (this.towerParts.towerTopCap.children.length > 0) {
+            if (this.towerParts.towerSections.children.length === 0) {
+                this.towerParts.towerTopCap.position.setY(this.sectionsHeight)
+            } else {
+                this.sectionsHeight = this.towerTopCapMountHeight;
+                this.towerParts.towerTopCap.position.setY(this.sectionsHeight)
+            }
+            this.towerParts.towerTopCap.position.setX(0.24)
+            this.towerParts.towerTopCap.position.setZ(0.367)
+            this.towerParts.towerTopCap.position.setY(this.towerParts.towerTopCap.position.y - 2.122)
+            this.object3DTower.add(this.towerParts.towerTopCap)
+        }
+
+        if (this.towerParts.towerBase.children.length > 0) {
+            this.towerParts.towerBase.position.setY(-(baseHeight))
+            this.object3DTower.add(this.towerParts.towerBase)
+        }
+
 
     }
-  
+    setTowerBase = (mpn) => {
+        this.towerParts.towerBase = this.getPart(mpn);
+    }
+    setTowerTopCap = (mpn) => {
+        this.towerParts.towerTopCap = this.getPart(mpn)
+    }
+    setTowerHeight = (height) => {
+        this.reset();
+        this.towerParts.towerSections = new THREE.Group;
+        this.useSectionAsBase = false;
+       
+        this.towerHeight = parseInt(height);
+        this.sectionsHeight = 0.0
+        
+        let numberOfSections = parseInt((this.towerHeight / 10) - 1);
+        if ((this.towerHeight.toString()[1] === "5")) {
+            this.useSectionAsBase = true;
+         
+            this.towerParts.towerBase = new THREE.Object3D();
+
+        }
+
+        let nextMountHeight = -6;
+        if (this.useSectionAsBase) {
+            nextMountHeight = -5
+        }
+
+        let addHeight = this.towerParts.towerSection.getHeight() - 2.25;
+    
+        for (let i = 0; i < numberOfSections; i++) {
+            const newSection = this.towerParts.towerSection.clone();
+            newSection.position.setY(nextMountHeight);
+            nextMountHeight += (addHeight);
+
+            this.towerParts.towerSections.add(newSection);
+        }
+        this.towerTopCapMountHeight = nextMountHeight;
+    }
 
 }
 

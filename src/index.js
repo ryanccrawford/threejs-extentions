@@ -10,7 +10,6 @@ import ToolIcon from "./toolicon.js";
 import ToolBar from "./toolbar.js";
 import Tower25G from "./tower.js";
 import { PartOptions } from "./partbase.js";
-import { Material } from "three";
 import Materials from "./materials.js";
 
 
@@ -132,7 +131,7 @@ const onStart = event => {
 
         let label = "Select Tower Height"
         heightOptions.push({ id: 0, name: label, isSelected: true })
-        const heightSelectBox = makeSelectBox("height", "height", label, onHeightSelect);
+        const heightSelectBox = makeSelectBox("height", "height", label, Thebuilder.onHeightSelect);
 
         for (let i = 0; i < heightOptions.length; i++) {
             const opt = document.createElement("option");
@@ -148,94 +147,6 @@ const onStart = event => {
     }
 }
 
-const getBaseOptions = () => {
-
-    let dataBases = ["Concrete Base Plate 25GSSB", "5' Short Base SB25G5", "Hinged Short Base SBH25G"];
-    let returnH = []
-    let count = -1;
-    for (let i = 0; i < dataBases.length; i++) {
-
-        returnH.push({ name: dataBases[i], id: ++count, isSelected: count === 0 ? true : false });
-    }
-    return returnH
-}
-
-
-const onHeightSelect = event => {
-    event.preventDefault();
-    Thebuilder.towerReady = false;
-    const itemSelected = parseInt(event.target.selectedOptions[0].text);
-    if (typeof Thebuilder.tower === 'undefined') {
-        Thebuilder.insertTower(tower);
-
-    }
-    // if (typeof Thebuilder.tower.parentRef === "undefined") {
-    //     tower.setParent(Thebuilder);
-    // }
-    
-    Thebuilder.scene.remove(Thebuilder.tower);
-    Thebuilder.setTowerHeight(itemSelected);
-    Thebuilder.createTower();
-
-    Thebuilder.scene.add(Thebuilder.tower);
-    Thebuilder.towerReady =true;
-
-
-    if (!document.getElementById('base')) {
-        const baseOptions = getBaseOptions()
-        const baseSelect = bindOptions(baseOptions, makeBaseSelect());
-
-
-        towerSelect.getElementsByClassName("card-body")[0].appendChild(baseSelect)
-    }
-
-
-
-}
-
-const bindOptions = (options, htmlSelectBox) => {
-
-    for (let i = 0; i < options.length; i++) {
-        const opt = document.createElement("option");
-        const textNode = document.createTextNode(options[i].name)
-        opt.appendChild(textNode);
-        opt.value = options[i].id.toString()
-        opt.selected = options[i].isSelected;
-        htmlSelectBox.appendChild(opt);
-    }
-    return htmlSelectBox
-}
-
-const onBaseSelect = (event) => {
-    event.preventDefault();
-
-    const itemSelected = event.target.selectedOptions[0].text;
-    if (typeof Thebuilder.tower !== 'undefined') {
-        const opt = new PartOptions();
-        opt.material = new Materials().ShinnyChrome;
-
-        if (itemSelected.includes("25GSSB")) {
-
-            Thebuilder.tower.changeBase("25GSSB");
-
-        }
-        if (itemSelected.includes("SB25G5")) {
-            Thebuilder.tower.changeBase("SB25G5");
-
-        }
-        if (itemSelected.includes("SBH25G")) {
-            Thebuilder.tower.changeBase("SBH25G");
-
-        }
-
-    }
-
-}
-
-const onTopCapSelect = (event) => {
-
-
-}
 
 const onToolButtonClick = (event) => {
     event.preventDefault();
@@ -252,17 +163,7 @@ function makeTowerSelect() {
     return card;
 }
 
-function makeBaseSelect() {
 
-    const baseSelect = makeSelectBox('base', 'base', 'Select Base (Optional)', onBaseSelect)
-    return baseSelect;
-}
-
-function makeTopCapSelect() {
-
-    const topCapSelect = makeSelectBox('topcap', 'topcap', 'Select Top Cap (Optional)', onTopCapSelect)
-    return topCapSelect;
-}
 
 const doneCreatingOptions = () => {
     towerSelect.getElementsByClassName("card-body")[0].appendChild(seiresSelectBox)
@@ -313,12 +214,7 @@ pageBody.appendChild(top);
 pageBody.appendChild(bottom)
 
 document.body.appendChild(pageBody);
-// if (module.hot) {
-//     module.hot.accept('./threedbuilder.js', function() {
-//         console.log("Accepting the updated threedbuilder module!");
-//         printMe();
-//     });
-// }
+
 const theWidth = renderarea.clientWidth;
 const usedSpace = document.getElementById('nav').clientHeight + 150;
 const theHeight = window.screen.availHeight - usedSpace;
