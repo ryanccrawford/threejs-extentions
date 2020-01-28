@@ -14,13 +14,12 @@ class Materials {
 		this.eMap.mapping = THREE.CubeRefractionMapping;
 		this.SandGravel = new THREE.TextureLoader().setPath("assets/images/textures/").load('sand.jpg')
 		this.ConcreteMap = new THREE.TextureLoader().setPath("assets/images/textures/").load('block-2.jpg')
-		this.ShinnyChrome = new THREE.MeshLambertMaterial({
+		
+		this.ShinnyChrome = new THREE.MeshPhongMaterial({
 				color: 0xcccccc,
 				envMap: this.eMap,
 				reflectivity: 0.5,
 				refractionRatio: 0.75,
-				shininess: 10,
-				roughness: 30,
 
 			})
 		this.DullChrome = new THREE.MeshLambertMaterial({
@@ -28,7 +27,6 @@ class Materials {
 			envMap: this.eMap,
 			reflectivity: 0.3,
 			refractionRatio: 0.78,
-			metalness: 78,
 		})
 		this.RollOver = new THREE.MeshBasicMaterial({
 			color: 0xff0000,

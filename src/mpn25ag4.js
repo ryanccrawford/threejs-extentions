@@ -3,19 +3,24 @@ import {
 	PartBase,
 	PartOptions
 } from "./partbase.js";
-import Materials from "./materials";
+import Materials from "./materials.js";
 
 class Mpn25ag4 extends PartBase {
 
 	constructor(options) {
-		if (typeof options === 'undefined') {
-			let options = new PartOptions();
-			options.readyCallback = null;
-		}
-		options.importFile = 'assets/3dmodels/25AG4.fbx'
+			let opt = new PartOptions();
+			if (typeof options === 'undefined') {
 
-		options.name = "25AG4"
-		super(options);
+				opt.readyCallback = null;
+			} else {
+				opt = options;
+			}
+		opt.importFile = 'assets/3dmodels/25AG4.fbx'
+		
+
+		opt.name = "25AG4"
+	
+		super(opt);
 	}
 
 

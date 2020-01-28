@@ -15,7 +15,7 @@ import MpnSb25g5 from './mpnsb25g5.js';
 import Tower25G from './tower.js';
 import Pad from './pad.js';
 
-class thebuilder {
+class Thebuilder {
     scene;
     isPaused = false;
     floorRef;
@@ -48,7 +48,7 @@ class thebuilder {
     lastIntersecpted;
     lastIntersecptedMaterial;
     line;
-
+    towerReady = false;
     constructor() {
         this.components = new components();
         this.raycaster = new THREE.Raycaster();
@@ -183,7 +183,7 @@ class thebuilder {
         const pad = new Pad(opt4);
 
         this.scene.add(pad);
-        this.animate();
+        this.render();
     };
 
     addEventListeners = () => {
@@ -201,10 +201,12 @@ class thebuilder {
     };
 
     animate = () => {
-        if (!this.isPaused) {
+            
+                this.render();
+            
+        
             this.update();
-            this.render();
-        }
+           
         requestAnimationFrame(this.animate);
     };
 
@@ -223,11 +225,13 @@ class thebuilder {
     };
 
     render = () => {
-        this.renderer.render(this.scene, this.camera);
+        if(this.towerReady){
+            this.renderer.render(this.scene, this.camera);
+        }
     };
 
     update = () => {
-        this.updateMousePosition();
+        //this.updateMousePosition();
 
         // if (this.scene.children[4]) {
         //     if (this.scene.children[4].children[0]) {
@@ -285,47 +289,6 @@ class thebuilder {
         }
     };
 
-    changeTowerHeight = height => {
-        this.isPaused = false
-            //   let ob = this.scene.getObjectsByName(this.tower.name)
-            //   this.scene.remove(ob)
-        const newTower = new Tower25G();
-
-        if (this.timesRemoved > 0) {
-            this.scene.remove(this.tower);
-        }
-        this.timesRemoved++;
-
-        newTower.changeHeight(parseInt(height));
-        newTower.towerBuild();
-        const bonder = newTower;
-        newTower.children.forEach(function(child) {
-            if (child.type === "Group") {
-                const bonder2 = bonder;
-                child.traverse(function(object) {
-                    if (typeof object.type === "Group") {
-                        let bb3 = object.createBoundingBox();
-                        bb3.geometry.center();
-                        // bonder2.add(bb3);
-                    }
-                });
-            } else {
-                if (typeof child.createBoundingBox === "function") {
-                    let bb = child.createBoundingBox();
-                    bb.geometry.center();
-                    //bonder.add(bb);
-                }
-            }
-        });
-        //this.tower = newTower;
-        // this.towerTopCap.geometry.center();
-        // this.towerBase.geometry.center();
-        // this.towerSection.geometry.center();
-        this.tower = newTower;
-    };
-    addTowerToScene = () => {
-        this.scene.add(this.tower)
-    }
 
     onDocumentMouseDown = event => {
         const intersects = this.raycaster.intersectObjects(this.scene.children);
@@ -352,5 +315,95 @@ class thebuilder {
             }
         }
     };
+    createTower = (baseType = "SB25G5", topCapType = "25AG3", numberOfSections = 1) => {
+      
+
+        for (var key in this.tower.towerParts.towerBases) {
+            if(key.name === baseType){
+                this.tower.towerParts.towerBase = key.part.clone();
+            }
+        }
+        for (var key in  this.tower.towerParts.towerTopCaps) {
+            if(key.name === topCapType){
+                this.tower.towerParts.towerTopCap = key.part.clone();
+            }
+        }
+        
+        let baseHeight = this.tower.towerParts.towerBase.getHeight() - 12;
+
+        if (this.tower.towerParts.towerSections.children.length > 0) {
+
+            this.tower.add(this.tower.towerParts.towerSections)
+        }
+        if (this.tower.towerParts.towerTopCap.children.length > 0) {
+            if (this.tower.towerParts.towerSections.children.length === 0) {
+                this.tower.towerParts.towerTopCap.position.setY(this.tower.sectionsHeight)
+            } else {
+                this.tower.sectionsHeight = this.tower.towerTopCapMountHeight;
+                this.tower.towerParts.towerTopCap.position.setY(this.tower.sectionsHeight)
+            }
+            this.tower.towerParts.towerTopCap.position.setX(0.24)
+            this.tower.towerParts.towerTopCap.position.setZ(0.367)
+            this.tower.towerParts.towerTopCap.position.setY(this.tower.towerParts.towerTopCap.position.y - 2.122)
+            this.tower.add(this.tower.towerParts.towerTopCap)
+        }
+
+        if (this.tower.towerParts.towerBase.children.length > 0) {
+            this.tower.towerParts.towerBase.position.setY(-(baseHeight))
+            this.tower.add(this.tower.towerParts.towerBase)
+        }
+       
+            // this.translate(0,0,0);
+            // this.position.copy(new THREE.Vector3(0, 0, 0.0));
+            // const box = new THREE.Box3().setFromObject( this );
+            //   box.getCenter( this.parentRef.getObjectByName("Pad") ); // this re-sets the obj position
+        
+
+    }
+    setTowerHeight = (height) => {
+        this.tower.reset();
+
+        this.tower.useSectionAsBase = false;
+        this.tower.towerHeight = parseInt(height);
+        this.tower.sectionsHeight = 0.0
+        
+        let numberOfSections = parseInt((this.tower.towerHeight / 10) - 1);
+        if ((this.tower.towerHeight.toString()[1] === 5)) {
+            this.tower.useSectionAsBase = true;
+         
+            this.tower.towerParts.towerBase = new THREE.Object3D();
+
+        }
+
+        
+
+        // const newGroup = new THREE.Group();
+        // newGroup.position.setX(-2.62)
+        // newGroup.position.setY(0.64)
+        // newGroup.position.setZ(17.99)
+
+        // newGroup.name = "Sections";
+        let nextMountHeight = -6;
+        if (this.tower.useSectionAsBase) {
+            nextMountHeight = -5
+        }
+
+        //this.towerParts.towerSections.children.splice(0)
+        let addHeight = this.tower.towerParts.towerSection.getHeight() - 2.25;
+     
+        
+        for (let i = 0; i < numberOfSections; i++) {
+            const newSection = this.tower.towerParts.towerSection.clone();
+            newSection.position.setY(nextMountHeight);
+            nextMountHeight += (addHeight);
+
+            this.tower.towerParts.towerSections.add(newSection);
+        }
+        this.tower.towerTopCapMountHeight = nextMountHeight;
+
+     
+
+    }
+
 }
-export default thebuilder;
+export default Thebuilder;

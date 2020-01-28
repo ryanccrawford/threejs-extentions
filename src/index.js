@@ -163,7 +163,7 @@ const getBaseOptions = () => {
 
 const onHeightSelect = event => {
     event.preventDefault();
-
+    Thebuilder.towerReady = false;
     const itemSelected = parseInt(event.target.selectedOptions[0].text);
     if (typeof Thebuilder.tower === 'undefined') {
         Thebuilder.insertTower(tower);
@@ -172,11 +172,13 @@ const onHeightSelect = event => {
     // if (typeof Thebuilder.tower.parentRef === "undefined") {
     //     tower.setParent(Thebuilder);
     // }
-    tower.setTowerHeight(itemSelected);
-    const ttower = tower.createTower();
-    ttower.children.forEach(function(child) {
-        Thebuilder.scene.add(child);
-    });
+    
+    Thebuilder.scene.remove(Thebuilder.tower);
+    Thebuilder.setTowerHeight(itemSelected);
+    Thebuilder.createTower();
+
+    Thebuilder.scene.add(Thebuilder.tower);
+    Thebuilder.towerReady =true;
 
 
     if (!document.getElementById('base')) {

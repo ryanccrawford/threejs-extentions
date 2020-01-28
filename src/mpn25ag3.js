@@ -4,14 +4,17 @@ import Materials from "./materials";
 
 class Mpn25ag3 extends PartBase {
     constructor(options) {
+        let opt = new PartOptions();
         if (typeof options === "undefined") {
-            let options = new PartOptions();
-            options.readyCallback = null;
+           
+            opt.readyCallback = null;
+        }else {
+            opt = options;
         }
-        options.importFile = "assets/3dmodels/25AG3.fbx";
+        opt.importFile = "assets/3dmodels/25AG3.fbx";
 
-        options.name = "25AG3";
-        super(options);
+        opt.name = "25AG3";
+        super(opt);
     }
 }
 
