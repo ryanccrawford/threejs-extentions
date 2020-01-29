@@ -43,6 +43,7 @@ module.exports = {
     },
     plugins: [
         new CopyPlugin([{ from: "./src/assets", to: "./assets" }]),
+        new CopyPlugin([{ from: "./src/*.png", to: "./" }]),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             inject: false,
@@ -60,18 +61,18 @@ module.exports = {
             mobile: true,
             lang: "en-US",
             links: [
-                "https://fonts.googleapis.com/css?family=Roboto"
+                "https://fonts.googleapis.com/css?family=Roboto",
                 // {
                 //   href: "/apple-touch-icon.png",
                 //   rel: "apple-touch-icon",
                 //   sizes: "180x180"
                 // },
-                // {
-                //   href: "/favicon-32x32.png",
-                //   rel: "icon",
-                //   sizes: "32x32",
-                //   type: "image/png"
-                // }
+                {
+                  href: "/favicon-32x32.png",
+                  rel: "icon",
+                  sizes: "32x32",
+                  type: "image/png"
+                }
             ],
             inlineManifestWebpackName: "webpackManifest",
             //   scripts: [
