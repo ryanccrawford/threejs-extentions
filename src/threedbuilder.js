@@ -53,11 +53,22 @@ class Thebuilder {
     selectedTopCap = "25AG3"
     towerHeight = 10;
     currentTowerUUID;
+    
+
+
     constructor() {
         this.components = new components();
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.chrome = new Materials().ShinnyChrome;
+        const i1 = document.getElementById("test")
+        const i2 = document.getElementById("test2")
+        const i3 = document.getElementById("test3")
+       i1.addEventListener("change", this.onChangePosition)
+       
+        i2.addEventListener("change", this.onChangePosition)
+       
+        i3.addEventListener("change", this.onChangePosition)
     }
     baseIsLoaded = part => {};
     topIsLoaded = part => {};
@@ -104,8 +115,8 @@ class Thebuilder {
     };
     onFloorReady = floor => {
         this.floor = floor;
-        this.scene.add(this.floor);
-        this.objects.push(this.floor);
+      //  this.scene.add(this.floor);
+      //  this.objects.push(this.floor);
     };
     createLights = () => {
         this.lights = new TowerLights();
@@ -175,21 +186,42 @@ class Thebuilder {
     };
 
     addEventListeners = () => {
-        // this.renderer.domElement.addEventListener(
-        //     "mousemove",
-        //     this.onDocumentMouseMove
-        // );
+        this.renderer.domElement.addEventListener(
+            "mousemove",
+            this.onDocumentMouseMove
+        );
 
-        // this.renderer.domElement.addEventListener(
-        //     "mousedown",
-        //     this.onDocumentMouseDown
-        // );
+        this.renderer.domElement.addEventListener(
+            "mousedown",
+            this.onDocumentMouseDown
+        );
 
+       
+        
         window.addEventListener("resize", this.onResize);
     };
-
+    onChangePosition = (event) => {
+        const inputId = event.target.id
+        console.log(event)
+        const inputValue = parseFloat(event.target.value)
+        console.log(inputValue)
+        if(window.builderSelectedItem.children.length > 0){
+            switch(inputId){
+                case "test":
+                    window.builderSelectedItem.position.setX(inputValue)
+                break
+                case "test2":
+                    window.builderSelectedItem.position.setY(inputValue)
+                break
+                case "test3":
+                    window.builderSelectedItem.position.setZ(inputValue)
+                break
+            }
+        }
+    }
     animate = () => {
         this.animationFrameId = requestAnimationFrame( this.animate );    
+       
         this.renderer.render(this.scene, this.camera);
         this.update();
     }
@@ -209,18 +241,18 @@ class Thebuilder {
     }
 
     update = () => {
-        // this.updateMousePosition();
+        this.updateMousePosition();
 
-        // if (this.scene.children[4]) {
-        //     if (this.scene.children[4].children[0]) {
-        //         document.getElementById("currentData").textContent =
-        //             "Current y:" + this.scene.children[4].children[0].position.y;
-        //         document.getElementById("currentData2").textContent =
-        //             "Current x:" + this.scene.children[4].children[0].position.x;
-        //         document.getElementById("currentData3").textContent =
-        //             "Current z:" + this.scene.children[4].children[0].position.z;
-        //     }
-        //}
+        if (this.scene.children[4]) {
+            if (window.builderSelectedItem) {
+                document.getElementById("test").textContent =
+                    "Current y:" + window.builderSelectedItem.position.y;
+                document.getElementById("test2").textContent =
+                    "Current x:" + window.builderSelectedItem.position.x;
+                document.getElementById("test3").textContent =
+                    "Current z:" + window.builderSelectedItem.position.z;
+            }
+        }
     }
 
     onResize = event => {
@@ -236,63 +268,57 @@ class Thebuilder {
 
     onDocumentMouseMove = event => {
         event.preventDefault();
-
-        // const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1.53;
-        // const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1.003;
-        // this.mouse.set(x, y);
-        // this.raycaster.setFromCamera(this.mouse, this.camera);
-        // if (!this.isPaused) {
-        //     let intersects = this.raycaster.intersectObjects(
-        //         this.scene.children
-        //     );
-        //     if (intersects.length > 0) {
-        //         const intercept = intersects[0];
-        //         const pointA = this.camera.position;
-
-        //         let direction = new THREE.Vector3();
-        //         this.camera.getWorldDirection(direction);
-        //         direction.normalize();
-
-        //         let pointB = intercept.point;
-
-        //         let distance = pointA.distanceTo(intercept.point);
-        //         pointB.addVectors(
-        //             pointA,
-        //             direction.multiplyScalar(distance)
-        //         );
-
-        //         this.line.geometry.vertices.push(pointA);
-        //         this.line.geometry.vertices.push(pointB);
-        //     }
-        // }
+        const x = (event.offsetX / this.renderer.domElement.clientWidth) * 2 - 1;
+        const y = -(event.offsetY / this.renderer.domElement.clientHeight) * 2 + 1;
+        // const x = (event.clientX / this.renderer.domElement.clientWidth) * 2 - 1;
+        // const y = -(event.clientY / this.renderer.domElement.clientHeight) * 2 + 1;
+        this.mouse.set(x, y);
     };
 
 
     onDocumentMouseDown = event => {
-        // const intersects = this.raycaster.intersectObjects(this.scene.children);
-
-        // if (intersects.length > 0) {
-        //     const intersect = intersects[0];
-        //     if (intersect.object != this.lastIntersecpted) {
-        //         if (this.lastIntersecpted) {
-        //             console.log(this.lastIntersecpted);
-        //             this.lastIntersecpted.material.color.setHex(
-        //                 this.lastIntersecpted.currentHex
-        //             );
-        //             this.lastIntersecpted = intersect.object;
-        //             this.lastIntersecpted.currentHex = this.lastIntersecpted.material.color.getHex();
-        //             this.lastIntersecpted.material.color.setHex("#023300");
-        //         }
-        //     }
-        // } else {
-        //     if (this.lastIntersecpted) {
-        //         this.lastIntersecpted.material.color.setHex(
-        //             this.lastIntersecpted.currentHex
-        //         );
-        //         this.lastIntersecpted = null;
-        //     }
-        // }
+        event.preventDefault();
+        console.log(event)
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+       
+        const intersects = this.raycaster.intersectObject(this.scene,true);
+        console.log(intersects)
+        if (intersects.length > 0) {
+           
+            const intersect = intersects[0];
+            this.selectObject(intersect.object, 0xff0000) ;
+            const info = document.createElement("p")
+            info.id = "selected3D"
+            info.innerText = intersect.name + " - " + intersect.type ;
+            if(!document.getElementById("selected3D")){
+                document.getElementById("toolBars").appendChild(info)
+            }else{
+                const replaceThis = document.getElementById("selected3D");
+                replaceThis.parentNode.replaceChild(info, replaceThis);
+            }
+        }
+       
     };
+    selectObject = (object3D, emissiveColor) => {
+        console.log(object3D)
+        document.getElementById("test2").value = object3D.getWorldPosition().y
+        document.getElementById("test").value = object3D.getWorldPosition().x
+        document.getElementById("test3").value = object3D.getWorldPosition().z
+        window.builderSelectedItem = object3D
+        this.scene.traverse(child => {
+            if(child.isMesh){
+                if(child.material.emissive.getHex() === emissiveColor){
+                    child.material.emissive.setHex(0x000000)
+                }
+            }
+        })
+        object3D.traverse(child => {
+            if(child.isMesh){
+                child.material.emissive.setHex(emissiveColor);
+            }
+        })
+
+    }
    
     onHeightSelect = event => {
         event.preventDefault();
@@ -300,7 +326,9 @@ class Thebuilder {
         const itemSelected = parseInt(event.target.selectedOptions[0].text);
         cancelAnimationFrame(this.animationFrameId)
         this.towerHeight = parseInt(itemSelected)    
+        console.log("Tower Hight Selected")
           
+        console.log(itemSelected)
         this.updateTower();
        
 
@@ -323,19 +351,21 @@ class Thebuilder {
     updateTower = () => {
         if(this.currentTowerUUID){
             this.scene.remove(this.currentTowerUUID)
+            //this.currentTowerUUID.dispose()
         }
         this.tower.reset();
        
         this.tower.setTowerBase(this.selectedBase);
         this.tower.setTowerTopCap(this.selectedTopCap);
+        console.log(this.towerHeight)
          this.tower.setTowerHeight(this.towerHeight);
         this.tower.createTower();
-        console.log("Right before the tower is added to scene")
-        console.log(this.tower)
+        
         this.currentTowerUUID = this.tower.get3DTowerObject();
         this.scene.add(this.currentTowerUUID);
-        console.log(this.Scene)
+      
         this.animate();
+       
 
     }
 
@@ -359,14 +389,14 @@ class Thebuilder {
     getBaseOptions = () => {
 
         let dataBases = [
-        {
-            name:"Concrete Base Plate 25GSSB",
+            {
+                name:"SB25G5", 
+                value: "SB25G5"
+            },{
+            name:"25GSSB",
             value: "25GSSB"
         }, {
-            name:"5' Short Base SB25G5", 
-            value: "SB25G5"
-        },{
-            name:"Hinged Short Base SBH25G",
+            name:"SBH25G",
             value:"SBH25G"
         }
         ];

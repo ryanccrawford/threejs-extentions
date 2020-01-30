@@ -53,7 +53,7 @@ class PartBase extends THREE.Object3D {
         if (typeof this.secondMaterial === 'object') {
             const bind = this;
             bind.traverse(function(item) {
-                console.log(item)
+                
                 if (item.name.includes("Drainage_Bed1")) {
                     const binddeep2 = bind;
                     item.traverse(function(child) {
@@ -93,7 +93,7 @@ class PartBase extends THREE.Object3D {
                         child.material = binder.material;
                     }
                 });
-                self.meshInMemory = object.clone();
+                self.meshInMemory = object.clone(false);
                 binder.importComplete(object);
             });
         } else {

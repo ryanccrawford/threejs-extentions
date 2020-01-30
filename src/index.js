@@ -9,12 +9,13 @@ import thebuilder from "./threedbuilder.js";
 import ToolIcon from "./toolicon.js";
 import ToolBar from "./toolbar.js";
 import Tower25G from "./tower.js";
-import { PartOptions } from "./partbase.js";
-import Materials from "./materials.js";
+import * as THREE from "three";
+
 
 
 var tower;
 var mode = "development";
+window.builderSelectedItem = new THREE.Object3D();
 const Thebuilder = new thebuilder();
 
 function pageContainer() {
