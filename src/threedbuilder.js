@@ -53,7 +53,7 @@ class Thebuilder {
     selectedTopCap = "25AG3"
     towerHeight = 10;
     currentTowerUUID;
-    
+
 
 
     constructor() {
@@ -64,10 +64,10 @@ class Thebuilder {
         const i1 = document.getElementById("test")
         const i2 = document.getElementById("test2")
         const i3 = document.getElementById("test3")
-       i1.addEventListener("change", this.onChangePosition)
-       
+        i1.addEventListener("change", this.onChangePosition)
+
         i2.addEventListener("change", this.onChangePosition)
-       
+
         i3.addEventListener("change", this.onChangePosition)
     }
     baseIsLoaded = part => {};
@@ -115,8 +115,8 @@ class Thebuilder {
     };
     onFloorReady = floor => {
         this.floor = floor;
-      //  this.scene.add(this.floor);
-      //  this.objects.push(this.floor);
+        //  this.scene.add(this.floor);
+        //  this.objects.push(this.floor);
     };
     createLights = () => {
         this.lights = new TowerLights();
@@ -134,7 +134,7 @@ class Thebuilder {
         this.renderer.setSize(this.width, this.height);
         this.onRendererReady();
     };
-   
+
     onRendererReady = () => {
         document
             .getElementById(this.appendToElement)
@@ -181,7 +181,7 @@ class Thebuilder {
         const pad = new Pad(opt4);
 
         this.scene.add(pad);
-        
+
         this.animate();
     };
 
@@ -196,8 +196,8 @@ class Thebuilder {
             this.onDocumentMouseDown
         );
 
-       
-        
+
+
         window.addEventListener("resize", this.onResize);
     };
     onChangePosition = (event) => {
@@ -205,23 +205,23 @@ class Thebuilder {
         console.log(event)
         const inputValue = parseFloat(event.target.value)
         console.log(inputValue)
-        if(window.builderSelectedItem){
-            switch(inputId){
+        if (window.builderSelectedItem) {
+            switch (inputId) {
                 case "test":
                     window.builderSelectedItem.position.setX(inputValue)
-                break
+                    break
                 case "test2":
                     window.builderSelectedItem.position.setY(inputValue)
-                break
+                    break
                 case "test3":
                     window.builderSelectedItem.position.setZ(inputValue)
-                break
+                    break
             }
         }
     }
     animate = () => {
-        this.animationFrameId = requestAnimationFrame( this.animate );    
-       
+        this.animationFrameId = requestAnimationFrame(this.animate);
+
         this.renderer.render(this.scene, this.camera);
         this.update();
     }
@@ -280,55 +280,55 @@ class Thebuilder {
         event.preventDefault();
         console.log(event)
         this.raycaster.setFromCamera(this.mouse, this.camera);
-       
-        const intersects = this.raycaster.intersectObject(this.currentTowerUUID,true);
+
+        const intersects = this.raycaster.intersectObject(this.currentTowerUUID, true);
         console.log(intersects)
         if (intersects.length > 0) {
-           
+
             const intersect = intersects[0];
-            this.selectObject(intersect.object, 0xff0000) ;
+            this.selectObject(intersect.object, 0xff0000);
             const info = document.createElement("p")
             info.id = "selected3D"
-            info.innerText = intersect.object.name + " - " + intersect.object.type ;
-            if(!document.getElementById("selected3D")){
+            info.innerText = intersect.object.name + " - " + intersect.object.type;
+            if (!document.getElementById("selected3D")) {
                 document.getElementById("toolBars").appendChild(info)
-            }else{
+            } else {
                 const replaceThis = document.getElementById("selected3D");
                 replaceThis.parentNode.replaceChild(info, replaceThis);
             }
         }
-       
+
     };
     selectObject = (object3D, emissiveColor) => {
         console.log(object3D)
-       
+
         window.builderSelectedItem = object3D
         this.scene.traverse(child => {
-            if(child.isMesh){
-                if(child.material.emissive.getHex() === emissiveColor){
+            if (child.isMesh) {
+                if (child.material.emissive.getHex() === emissiveColor) {
                     child.material.emissive.setHex(0x000000)
                 }
             }
         })
         object3D.traverse(child => {
-            if(child.isMesh){
+            if (child.isMesh) {
                 child.material.emissive.setHex(emissiveColor);
             }
         })
 
     }
-   
+
     onHeightSelect = event => {
         event.preventDefault();
-      
+
         const itemSelected = parseInt(event.target.selectedOptions[0].text);
         cancelAnimationFrame(this.animationFrameId)
-        this.towerHeight = parseInt(itemSelected)    
+        this.towerHeight = parseInt(itemSelected)
         console.log("Tower Hight Selected")
-          
+
         console.log(itemSelected)
         this.updateTower();
-       
+
 
         if (!document.getElementById('base')) {
             const baseOptions = this.getBaseOptions()
@@ -343,27 +343,54 @@ class Thebuilder {
             document.getElementById('toolBars').appendChild(newBasePartsBox)
             document.getElementById('toolBars').appendChild(newTopCapPartsBox)
         }
-      
-    
+
+
     }
     updateTower = () => {
-        if(this.currentTowerUUID){
+        if (this.currentTowerUUID) {
             this.scene.remove(this.currentTowerUUID)
-            //this.currentTowerUUID.dispose()
+                //this.currentTowerUUID.dispose()
         }
         this.tower.reset();
-      
+
         this.tower.setTowerBase(this.selectedBase);
         this.tower.setTowerTopCap(this.selectedTopCap);
         console.log(this.towerHeight)
-         this.tower.setTowerHeight(this.towerHeight);
+        this.tower.setTowerHeight(this.towerHeight);
         this.tower.createTower();
-        
+
         this.currentTowerUUID = this.tower.get3DTowerObject();
         this.scene.add(this.currentTowerUUID);
         //this.objects.push(this.currentTowerUUID)
+        const box = new THREE.Box3();
+
+        box.expandByObject(this.currentTowerUUID);
+
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+
+        const maxSize = Math.max(size.x, size.y, size.z);
+        const fitHeightDistance =
+            maxSize / (2 * Math.atan((Math.PI * this.camera.fov) / 360));
+        const fitWidthDistance = fitHeightDistance / this.camera.aspect;
+        const distance = 1 * Math.max(fitHeightDistance, fitWidthDistance);
+
+        const direction = this.controls.target
+            .clone()
+            .sub(this.camera.position)
+            .normalize()
+            .multiplyScalar(distance);
+
+        this.controls.maxDistance = distance * 10;
+        this.controls.target.copy(center);
+
+        this.camera.near = distance / 100;
+        this.camera.far = distance * 100;
+        this.camera.updateProjectionMatrix();
+
+        this.camera.position.copy(this.controls.target).sub(direction);
         this.animate();
-       
+
 
     }
 
@@ -377,43 +404,41 @@ class Thebuilder {
         const baseSelect = this.makeSelectBox('base', 'base', 'Select Base (Optional)', this.onBaseSelect)
         return baseSelect;
     }
-    
+
     makeTopCapSelect = () => {
-    
+
         const topCapSelect = this.makeSelectBox('topcap', 'topcap', 'Select Top Cap (Optional)', this.onTopCapSelect)
         return topCapSelect;
     }
 
     getBaseOptions = () => {
 
-        let dataBases = [
-            {
-                name:"SB25G5", 
-                value: "SB25G5"
-            },{
-            name:"25GSSB",
+        let dataBases = [{
+            name: "SB25G5",
+            value: "SB25G5"
+        }, {
+            name: "25GSSB",
             value: "25GSSB"
         }, {
-            name:"SBH25G",
-            value:"SBH25G"
-        }
-        ];
+            name: "SBH25G",
+            value: "SBH25G"
+        }];
         let returnH = []
         let count = -1;
         for (let i = 0; i < dataBases.length; i++) {
-         returnH.push({ name: dataBases[i].name, value: dataBases[i].value, id: ++count, isSelected: count === 0 ? true : false });
+            returnH.push({ name: dataBases[i].name, value: dataBases[i].value, id: ++count, isSelected: count === 0 ? true : false });
         }
         return returnH
     }
-    
+
     getTopCapOptions = () => {
 
         let dataBases = ["25AG3", "25AG4", "25AG5"];
         let returnH = []
         let count = -1;
         for (let i = 0; i < dataBases.length; i++) {
-         returnH.push({ name: dataBases[i], value: dataBases[i] ,isSelected: count === 0 ? true : false });
-         ++count;
+            returnH.push({ name: dataBases[i], value: dataBases[i], isSelected: count === 0 ? true : false });
+            ++count;
         }
         return returnH
     }
@@ -422,10 +447,10 @@ class Thebuilder {
         const partSelectionBox = this.components.card("", name, null)
         return partSelectionBox;
     }
-    
-    
+
+
     bindOptions = (options, htmlSelectBox) => {
-    
+
         for (let i = 0; i < options.length; i++) {
             const opt = document.createElement("option");
             const textNode = document.createTextNode(options[i].name)
@@ -436,31 +461,31 @@ class Thebuilder {
         }
         return htmlSelectBox
     }
-    
+
     onBaseSelect = (event) => {
         event.preventDefault();
-    
+
         const itemSelected = event.target.selectedOptions[0].value;
         if (typeof this.tower !== 'undefined') {
             cancelAnimationFrame(this.animationFrameId)
             this.selectedBase = itemSelected
             this.updateTower()
         }
-    
+
     }
-    
+
     onTopCapSelect = (event) => {
         event.preventDefault();
-    
+
         const itemSelected = event.target.selectedOptions[0].value;
         if (typeof this.tower !== 'undefined') {
             cancelAnimationFrame(this.animationFrameId)
             this.selectedTopCap = itemSelected
             this.updateTower()
         }
-    
+
     }
-    
+
 
 }
 export default Thebuilder;
