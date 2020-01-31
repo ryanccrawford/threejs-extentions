@@ -24,12 +24,16 @@ class Tower25G {
         this.object3DTower = new THREE.Group();
         this.towerModel = "25G"
         this.name = this.towerModel + " Tower";
-       
+
         const base25GSSB = "25GSSB";
         const baseSB25G5 = "SB25G5";
         const baseSBH25G = "SBH25G";
 
-
+        const section25G = "25G"
+        this.towerParts.towerSection = [{
+            name: section25G,
+            part: new Mpn25g()
+        }]
         this.towerParts.towerBases = [{
                 name: baseSBH25G,
                 part: new MpnSbh25g()
@@ -65,9 +69,9 @@ class Tower25G {
                 part: new Mpn25ag5()
             }
         ]
-        this.towerParts.section = new Mpn25g();
+
         this.towerHeight = 10;
-       this.reset();
+        this.reset();
     }
     reset = () => {
         this.object3DTower = new THREE.Group()
@@ -83,34 +87,48 @@ class Tower25G {
     getPart = (name, clone = true) => {
 
         for (let index in this.towerParts.towerBases) {
-            if(this.towerParts.towerBases[parseInt(index)].name === name){
-               if(clone){
+            if (this.towerParts.towerBases[parseInt(index)].name === name) {
+                if (clone) {
                     return this.towerParts.towerBases[parseInt(index)].part.clone();
-               }else{
+                } else {
                     return this.towerParts.towerBases[parseInt(index)].part
-               }
-                
+                }
+
             }
         }
 
         for (let indexTop in this.towerParts.towerTopCaps) {
 
-            if(this.towerParts.towerTopCaps[parseInt(indexTop)].name === name){
-                if(clone){
+            if (this.towerParts.towerTopCaps[parseInt(indexTop)].name === name) {
+                if (clone) {
                     return this.towerParts.towerTopCaps[parseInt(indexTop)].part.clone();
-                   }else{
+                } else {
                     return this.towerParts.towerTopCaps[parseInt(indexTop)].part
-                   }
+                }
+            }
+        }
+
+        for (let indexSection in this.towerParts.towerSection) {
+            if (
+                this.towerParts.towerSection[parseInt(indexSection)].name === name
+            ) {
+                if (clone) {
+                    return this.towerParts.towerSection[
+                        parseInt(indexSection)
+                    ].part.clone();
+                } else {
+                    return this.towerParts.towerSection[parseInt(indexSection)].part;
+                }
             }
         }
 
         throw "Error, could not find part named " + name;
     }
     createTower = () => {
-      
+
         this.object3DTower = new THREE.Group()
 
-        let baseHeight = this.towerParts.towerBase.getHeight() ;
+        let baseHeight = this.towerParts.towerBase.getHeight();
 
         if (this.towerParts.towerSections.children.length > 0) {
             console.log(this.towerParts.towerSections)
@@ -120,24 +138,26 @@ class Tower25G {
             if (this.towerParts.towerSections.children.length === 0) {
                 this.towerParts.towerTopCap.position.setY(this.sectionsHeight)
             } else {
-              // this.sectionsHeight = this.towerTopCapMountHeight;
-                this.towerParts.towerTopCap.position.setY(this.sectionsHeight + 8.75)
+                // this.sectionsHeight = this.towerTopCapMountHeight;
+                this.towerParts.towerTopCap.position.setY(
+                    this.towerTopCapMountHeight + 1.25
+                );
             }
-         //  this.towerParts.towerTopCap.position.setX(0.24)
-       //     this.towerParts.towerTopCap.position.setZ(0.367)
-           this.towerParts.towerTopCap.position.setY(this.towerParts.towerTopCap.position.y - 0)
+            //  this.towerParts.towerTopCap.position.setX(0.24)
+            //     this.towerParts.towerTopCap.position.setZ(0.367)
+            //this.towerParts.towerTopCap.position.setY(this.towerParts.towerTopCap.position.y - 0)
             this.object3DTower.add(this.towerParts.towerTopCap)
         }
 
         if (this.towerParts.towerBase.children.length > 0) {
-            if(this.towerParts.towerBase.name.includes("SS")){
+            if (this.towerParts.towerBase.name.includes("SS")) {
                 this.towerParts.towerBase.position.setY(6.5)
                 this.towerParts.towerBase.position.setX(-1)
                 this.towerParts.towerBase.position.setZ(-1)
-            }else{
-            this.towerParts.towerBase.position.setY(-(baseHeight) + 12)
+            } else {
+                this.towerParts.towerBase.position.setY(-(baseHeight) + 12)
             }
-         
+
             this.object3DTower.add(this.towerParts.towerBase)
         }
 
@@ -155,15 +175,15 @@ class Tower25G {
         this.towerHeight = parseInt(height);
         this.towerParts.towerSections = new THREE.Group();
         this.useSectionAsBase = false;
-       
-    
+
+
         this.sectionsHeight = 0.0
-        
+
         let numberOfSections = parseInt((this.towerHeight / 10) - 1);
         if ((this.towerHeight.toString()[1] === "5")) {
             this.useSectionAsBase = true;
-         
-           
+
+
 
         }
 
@@ -171,20 +191,21 @@ class Tower25G {
         if (this.useSectionAsBase) {
             nextMountHeight = -5
         }
-        if(!this.towerParts.towerSection){
-            this.towerParts.towerSection = new Mpn25g();
-        }
 
-        let addHeight = this.towerParts.towerSection.getHeight();
-    
+
         for (let i = 0; i < numberOfSections; i++) {
-            let newSection = this.towerParts.towerSection.clone(false);
+            const newSection = this.getPart("25G")
             newSection.position.setY(nextMountHeight);
+            let addHeight = newSection.getHeight();
+            console.log("section height");
+            console.log(addHeight);
             nextMountHeight += (addHeight - 1.25);
+            console.log("next section height");
+            console.log(nextMountHeight);
 
             this.towerParts.towerSections.add(newSection);
         }
-        this.towerTopCapMountHeight = nextMountHeight + (addHeight - 1.25);
+        this.towerTopCapMountHeight = nextMountHeight;
     }
 
 }
