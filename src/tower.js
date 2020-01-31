@@ -4,7 +4,7 @@ import Mpn25ag4 from "./mpn25ag4.js";
 import Mpn25ag3 from "./mpn25ag3.js";
 import MpnSb25g5 from "./mpnsb25g5.js";
 import Mpn25gssb from "./mpn25gssb.js";
-import MpnSbh25g from "./mpnSbh25g.js";
+import MpnSbh25g from "./mpnbh25g.js/index.js";
 import * as THREE from "three";
 
 class Tower25G {
