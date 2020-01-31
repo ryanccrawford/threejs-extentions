@@ -205,7 +205,7 @@ class Thebuilder {
         console.log(event)
         const inputValue = parseFloat(event.target.value)
         console.log(inputValue)
-        if(window.builderSelectedItem.children.length > 0){
+        if(window.builderSelectedItem){
             switch(inputId){
                 case "test":
                     window.builderSelectedItem.position.setX(inputValue)
@@ -281,7 +281,7 @@ class Thebuilder {
         console.log(event)
         this.raycaster.setFromCamera(this.mouse, this.camera);
        
-        const intersects = this.raycaster.intersectObject(this.scene,true);
+        const intersects = this.raycaster.intersectObject(this.currentTowerUUID,true);
         console.log(intersects)
         if (intersects.length > 0) {
            
@@ -289,7 +289,7 @@ class Thebuilder {
             this.selectObject(intersect.object, 0xff0000) ;
             const info = document.createElement("p")
             info.id = "selected3D"
-            info.innerText = intersect.name + " - " + intersect.type ;
+            info.innerText = intersect.object.name + " - " + intersect.object.type ;
             if(!document.getElementById("selected3D")){
                 document.getElementById("toolBars").appendChild(info)
             }else{
@@ -301,9 +301,7 @@ class Thebuilder {
     };
     selectObject = (object3D, emissiveColor) => {
         console.log(object3D)
-        document.getElementById("test2").value = object3D.getWorldPosition().y
-        document.getElementById("test").value = object3D.getWorldPosition().x
-        document.getElementById("test3").value = object3D.getWorldPosition().z
+       
         window.builderSelectedItem = object3D
         this.scene.traverse(child => {
             if(child.isMesh){
@@ -354,7 +352,7 @@ class Thebuilder {
             //this.currentTowerUUID.dispose()
         }
         this.tower.reset();
-       
+      
         this.tower.setTowerBase(this.selectedBase);
         this.tower.setTowerTopCap(this.selectedTopCap);
         console.log(this.towerHeight)
@@ -363,7 +361,7 @@ class Thebuilder {
         
         this.currentTowerUUID = this.tower.get3DTowerObject();
         this.scene.add(this.currentTowerUUID);
-      
+        //this.objects.push(this.currentTowerUUID)
         this.animate();
        
 
