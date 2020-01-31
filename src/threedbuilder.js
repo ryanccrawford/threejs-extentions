@@ -51,12 +51,14 @@ class Thebuilder {
     animationFrameId;
     selectedBase = "SB25G5"
     selectedTopCap = "25AG3"
+    selectedPart
     towerHeight = 10;
     currentTowerUUID;
 
 
 
     constructor() {
+        this.selectedPart = new THREE.Object3D();
         this.components = new components();
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
@@ -286,6 +288,7 @@ class Thebuilder {
         if (intersects.length > 0) {
 
             const intersect = intersects[0];
+            
             this.selectObject(intersect.object, 0xff0000);
             const info = document.createElement("p")
             info.id = "selected3D"
@@ -299,10 +302,13 @@ class Thebuilder {
         }
 
     };
-    selectObject = (object3D, emissiveColor) => {
-        console.log(object3D)
+    selectObject = (object, emissiveColor) => {
 
-        window.builderSelectedItem = object3D
+        this.getParentPart(object, emissiveColor)
+
+    }
+    onSelectedPart = (part, emissiveColor) => {
+        window.builderSelectedItem = part;
         this.scene.traverse(child => {
             if (child.isMesh) {
                 if (child.material.emissive.getHex() === emissiveColor) {
@@ -310,24 +316,42 @@ class Thebuilder {
                 }
             }
         })
-        object3D.traverse(child => {
+        part.traverse(child => {
             if (child.isMesh) {
                 child.material.emissive.setHex(emissiveColor);
             }
         })
-
     }
-
+    getParentPart = (childObject, emissiveColor) => {
+        const thisBinder = this
+        let part = null;
+        childObject.traverse(child => {
+            console.log(child)
+            for(var towerPartsGroup in this.tower.towerParts){
+                console.log(towerPartsGroup)
+                for(var parts in towerPartsGroup){
+                    console.log(parts)
+                    if(parts.name === child.parent.name){
+                        part = child.parent;
+                        thisBinder.onSelectedPart(part, emissiveColor).bind(thisBinder);
+                        return;
+                    }
+                }
+            }
+        })
+    }
     onHeightSelect = event => {
         event.preventDefault();
-
-        const itemSelected = parseInt(event.target.selectedOptions[0].text);
+        let dispalyValueLabelId = event.target.id + "_display"
+        const labelDisplay = document.getElementById(dispalyValueLabelId)
+        const itemSelected = parseInt(event.target.value);
         cancelAnimationFrame(this.animationFrameId)
         this.towerHeight = parseInt(itemSelected)
         console.log("Tower Hight Selected")
 
         console.log(itemSelected)
-        this.updateTower();
+        labelDisplay.innerText = "Current: " + itemSelected + "' Feet"
+         this.updateTower();
 
 
         if (!document.getElementById('base')) {

@@ -187,7 +187,7 @@ class Tower25G {
 
         }
 
-        let nextMountHeight = -6;
+        let nextMountHeight = 0;
         if (this.useSectionAsBase) {
             nextMountHeight = -5
         }
@@ -196,10 +196,10 @@ class Tower25G {
         for (let i = 0; i < numberOfSections; i++) {
             const newSection = this.getPart("25G")
             newSection.position.setY(nextMountHeight);
-            let addHeight = newSection.getHeight();
+            let addHeight = newSection.getHeight() - 2.00;
             console.log("section height");
             console.log(addHeight);
-            nextMountHeight += (addHeight - 1.25);
+            nextMountHeight += (addHeight - 2.00);
             console.log("next section height");
             console.log(nextMountHeight);
 
