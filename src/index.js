@@ -174,7 +174,7 @@ const onStart = event => {
         const tb = Thebuilder;
 
         const heightSelectBox = makeSliderBar("height", "height", label, minHeight, maxHeight, "all", heightOptions, tb.onHeightSelect)
-        heightSelectBox.value = 10
+        heightSelectBox.value = "10";
         showHeightSelection(heightSelectBox);
     }
 }
