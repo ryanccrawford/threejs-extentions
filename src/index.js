@@ -17,6 +17,7 @@ var tower;
 var mode = "development";
 window.builderSelectedItem = new THREE.Object3D();
 const Thebuilder = new thebuilder();
+window.Thebuilder = Thebuilder;
 
 function pageContainer() {
     const Components = new components();
@@ -102,102 +103,78 @@ function makeSelectBox(id, name, label, onSelectionEvent) {
     return Components.selectBox(id, name, label, onSelectionEvent)
 }
 
-function makeSliderBar(id, name, labelText, min = 10, max = 100, snapTo = 10, list, onChangeEvent){
-                const Components = new components();
-    //<div class="form-group">
-//     <label for="formControlRange">Example Range input</label>
-//     <input type="range" class="form-control-range" id="formControlRange">
-//   </div>
-                const range = Components.c("input")
-                const label = Components.c("label")
-                const lableValue = Components.c("div")
-                
-                const div = Components.c("div")
-                div.className = "form-group"
-                label.innerText = labelText
-                label.for = "labelText"
-                range.type = "range"
-                range.className = ".custom-range"
-                range.id = id
-                range.name = name
-                range.min = min
-                range.max = max
-                range.step = snapTo
-                range.value = 10;
-                lableValue.innerText = "Cuerrent: " + range.value;
-                lableValue.id = id + "_display"
-                const ticks = Components.c("datalist");
-                ticks.id = "ticks_" + range.id
-                range.setAttribute("list", ticks.id)
-                for(let i = 0; i < (list.length);i++){
-                   
-                    const opt = Components.c("option")
-                    opt.value = parseInt(list[i]);
-                    opt.setAttribute("label", list[i]);
-                    ticks.appendChild(opt)
-                }
-                range.addEventListener("change", onChangeEvent);
-                div.appendChild(label)
-                div.appendChild(lableValue)
-                div.appendChild(range)
-                  div.appendChild(ticks)
-                
-                
-                return div;
+function makeSliderBar(id, name, labelText, min = 10, max = 100, snapTo = 10, list, onChangeEventSent) {
+    const Components = new components();
+    const range = Components.c("input")
+    const label = Components.c("label")
+    const lableValue = Components.c("div")
+    const div = Components.c("div")
+    div.className = "form-group"
+    label.innerText = labelText
+    label.for = "labelText"
+    range.type = "range"
+    range.className = ".custom-range"
+    range.id = id
+    range.name = name
+    range.min = min
+    range.max = max
+    range.step = snapTo
+    range.value = "10";
+    lableValue.innerText = "Cuerrent: " + range.value;
+    lableValue.id = id + "_display"
+    const ticks = Components.c("datalist");
+    ticks.id = "ticks_" + range.id
+    range.setAttribute("list", ticks.id)
+    for (let i = 0; i < (list.length); i++) {
+
+        const opt = Components.c("option")
+        opt.value = parseInt(list[i]);
+        opt.setAttribute("label", list[i]);
+        ticks.appendChild(opt)
+    }
+    range.setAttribute("oninput", "window.Thebuilder.onHeightSelect(this)");
+    div.appendChild(label)
+    div.appendChild(lableValue)
+    div.appendChild(range)
+    div.appendChild(ticks)
+
+
+    return div;
 }
 
+
+
 const showHeightSelection = (box) => {
-     const Components = new components();
-     const p = Components.c("p")
-     p.appendChild(box);
-     let html = p.innerHTML
-     
-     const card =   Components.card(html, "Height")
-     
+    const Components = new components();
+    const p = Components.c("p")
+    p.appendChild(box);
+    let html = p.innerHTML
+
+    const card = Components.card(html, "Height")
+
     document.getElementById("toolBars").appendChild(card)
 }
 
 const getHeightOption = () => {
-    //TODO: Check to see which heights are avalible
     let dataHeights = [10, 20, 30, 40];
     return dataHeights
-    // let returnH = []
-    // let count = -1;
-    // for (let i = 0; i < dataHeights.length; i++) {
-
-    //     returnH.push({ name: dataHeights[i], id: ++count, isSelected: count === 0 ? true : false });
-    // }
-    // return returnH
 }
 
 const onStart = event => {
-    //event.preventDefault();
+
     const itemSelected = event.target.selectedOptions[event.target.selectedIndex];
-    //itemSelected.selected = true;
-    console.log(itemSelected.textContent);
-    //setModel(itemSelected.textContent);
 
     if (!document.getElementById('height')) {
         const heightOptions = getHeightOption()
-        
+
         let minHeight = Math.min(...heightOptions)
         let maxHeight = Math.max(...heightOptions)
 
         let label = "Select Tower Height"
-     
-        // const heightSelectBox = makeSelectBox("height", "height", label, Thebuilder.onHeightSelect);
-        const heightSelectBox = makeSliderBar("height","height", label, minHeight, maxHeight, "all", heightOptions, Thebuilder.onHeightSelect)
+        const tb = Thebuilder;
 
-        // for (let i = 0; i < heightOptions.length; i++) {
-            // const opt = document.createElement("option");
-            // const textNode = document.createTextNode(heightOptions[i].name)
-            // opt.appendChild(textNode);
-            // opt.value = heightOptions[i].id.toString()
-            // opt.selected = heightOptions[i].isSelected;
-            // heightSelectBox.appendChild(opt);
-        // }
-
-
+        const heightSelectBox = makeSliderBar("height", "height", label, minHeight, maxHeight, "all", heightOptions, tb.onHeightSelect)
+        heightSelectBox.value = 10
         showHeightSelection(heightSelectBox);
     }
 }

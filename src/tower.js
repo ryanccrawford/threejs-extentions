@@ -6,6 +6,7 @@ import MpnSb25g5 from "./mpnsb25g5.js";
 import Mpn25gssb from "./mpn25gssb.js";
 import MpnSbh25g from "./mpnsbh25g.js";
 import * as THREE from "three";
+import Pad from "./pad.js";
 
 class Tower25G {
     renderCanRun = false;
@@ -19,7 +20,7 @@ class Tower25G {
     useSectionAsBase = false;
     sectionsHeight = 0.00;
     object3DTower;
-
+    padHeight = 8;
     constructor() {
         this.object3DTower = new THREE.Group();
         this.towerModel = "25G"
@@ -130,35 +131,41 @@ class Tower25G {
 
         let baseHeight = this.towerParts.towerBase.getHeight();
 
-        if (this.towerParts.towerSections.children.length > 0) {
-            console.log(this.towerParts.towerSections)
-            this.object3DTower.add(this.towerParts.towerSections)
-        }
-        if (this.towerParts.towerTopCap.children.length > 0) {
-            if (this.towerParts.towerSections.children.length === 0) {
-                this.towerParts.towerTopCap.position.setY(this.sectionsHeight)
-            } else {
-                // this.sectionsHeight = this.towerTopCapMountHeight;
-                this.towerParts.towerTopCap.position.setY(
-                    this.towerTopCapMountHeight + 1.25
-                );
-            }
-            //  this.towerParts.towerTopCap.position.setX(0.24)
-            //     this.towerParts.towerTopCap.position.setZ(0.367)
-            //this.towerParts.towerTopCap.position.setY(this.towerParts.towerTopCap.position.y - 0)
-            this.object3DTower.add(this.towerParts.towerTopCap)
-        }
+        let sectionOffSet = 0;
 
         if (this.towerParts.towerBase.children.length > 0) {
             if (this.towerParts.towerBase.name.includes("SS")) {
                 this.towerParts.towerBase.position.setY(6.5)
-                this.towerParts.towerBase.position.setX(-1)
-                this.towerParts.towerBase.position.setZ(-1)
+                this.towerParts.towerBase.position.setX(-3)
+                this.towerParts.towerBase.position.setZ(4 - 0.25);
+            } else if (this.towerParts.towerBase.name.includes("SBH")) {
+                this.towerParts.towerBase.position.setX(-0.75)
+                this.towerParts.towerBase.position.setY(-baseHeight + 16.250);
+                sectionOffSet += 10.25 - 4;
             } else {
-                this.towerParts.towerBase.position.setY(-(baseHeight) + 12)
+                this.towerParts.towerBase.position.setY(-baseHeight + 12);
             }
 
             this.object3DTower.add(this.towerParts.towerBase)
+        }
+        sectionOffSet += this.towerParts.towerSections.position.y;
+        if (this.towerParts.towerSections.children.length > 0) {
+            sectionOffSet += this.towerParts.towerSections.position.y;
+            this.towerParts.towerSections.position.setY(sectionOffSet);
+            this.object3DTower.add(this.towerParts.towerSections);
+        }
+        if (this.towerParts.towerTopCap.children.length > 0) {
+            if (this.towerParts.towerSections.children.length === 0) {
+                this.towerParts.towerTopCap.position.setY(
+                    this.towerTopCapMountHeight + this.sectionsHeight + sectionOffSet
+                );
+            } else {
+                this.towerParts.towerTopCap.position.setY(
+                    (this.towerTopCapMountHeight + sectionOffSet)
+                );
+            }
+
+            this.object3DTower.add(this.towerParts.towerTopCap);
         }
 
 
@@ -187,7 +194,7 @@ class Tower25G {
 
         }
 
-        let nextMountHeight = 0;
+        let nextMountHeight = this.padHeight;
         if (this.useSectionAsBase) {
             nextMountHeight = -5
         }
@@ -196,10 +203,10 @@ class Tower25G {
         for (let i = 0; i < numberOfSections; i++) {
             const newSection = this.getPart("25G")
             newSection.position.setY(nextMountHeight);
-            let addHeight = newSection.getHeight() - 2.00;
+            let addHeight = newSection.getHeight() - 1.75;
             console.log("section height");
             console.log(addHeight);
-            nextMountHeight += (addHeight - 2.00);
+            nextMountHeight += (addHeight - 1.75);
             console.log("next section height");
             console.log(nextMountHeight);
 
