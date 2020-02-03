@@ -136,10 +136,9 @@ class Tower25G {
         if (this.towerParts.towerBase.children.length > 0) {
             if (this.towerParts.towerBase.name.includes("SS")) {
                 this.towerParts.towerBase.position.setY(6.5)
-                this.towerParts.towerBase.position.setX(-3)
-                this.towerParts.towerBase.position.setZ(4 - 0.25);
+
             } else if (this.towerParts.towerBase.name.includes("SBH")) {
-                this.towerParts.towerBase.position.setX(-0.75)
+
                 this.towerParts.towerBase.position.setY(-baseHeight + 16.250);
                 sectionOffSet += 10.25 - 4;
             } else {
@@ -182,34 +181,22 @@ class Tower25G {
         this.towerHeight = parseInt(height);
         this.towerParts.towerSections = new THREE.Group();
         this.useSectionAsBase = false;
-
-
         this.sectionsHeight = 0.0
 
         let numberOfSections = parseInt((this.towerHeight / 10) - 1);
         if ((this.towerHeight.toString()[1] === "5")) {
             this.useSectionAsBase = true;
-
-
-
         }
 
         let nextMountHeight = this.padHeight;
         if (this.useSectionAsBase) {
             nextMountHeight = -5
         }
-
-
         for (let i = 0; i < numberOfSections; i++) {
             const newSection = this.getPart("25G")
             newSection.position.setY(nextMountHeight);
             let addHeight = newSection.getHeight() - 1.75;
-            console.log("section height");
-            console.log(addHeight);
             nextMountHeight += (addHeight - 1.75);
-            console.log("next section height");
-            console.log(nextMountHeight);
-
             this.towerParts.towerSections.add(newSection);
         }
         this.towerTopCapMountHeight = nextMountHeight;

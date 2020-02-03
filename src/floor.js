@@ -39,7 +39,8 @@ class Floor extends PartBase {
             new THREE.MeshBasicMaterial({
                 color: this.gridColor,
                 //visible: false,
-
+                transparent: true,
+                opacity: 1,
             })
         );
 

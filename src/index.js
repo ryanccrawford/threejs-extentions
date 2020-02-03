@@ -132,7 +132,7 @@ function makeSliderBar(id, name, labelText, min = 10, max = 100, snapTo = 10, li
         opt.setAttribute("label", list[i]);
         ticks.appendChild(opt)
     }
-    range.setAttribute("oninput", "window.Thebuilder.onHeightSelect(this)");
+    range.setAttribute("oninput", "window.Thebuilder." + onChangeEventSent + "(this)");
     div.appendChild(label)
     div.appendChild(lableValue)
     div.appendChild(range)
@@ -171,9 +171,8 @@ const onStart = event => {
         let maxHeight = Math.max(...heightOptions)
 
         let label = "Select Tower Height"
-        const tb = Thebuilder;
 
-        const heightSelectBox = makeSliderBar("height", "height", label, minHeight, maxHeight, "all", heightOptions, tb.onHeightSelect)
+        const heightSelectBox = makeSliderBar("height", "height", label, minHeight, maxHeight, "all", heightOptions, "onHeightSelect")
         heightSelectBox.value = "10";
         showHeightSelection(heightSelectBox);
     }

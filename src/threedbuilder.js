@@ -53,6 +53,7 @@ class Thebuilder {
     towerHeight = 10;
     currentTowerUUID;
     validHeights = [10, 20, 30, 35, 40];
+    autoRotate = true;
 
     constructor() {
         this.selectedPart = new THREE.Object3D();
@@ -237,6 +238,8 @@ class Thebuilder {
 
     update = () => {
         this.updateMousePosition();
+        this.controls.autoRotate = this.autoRotate;
+
         this.controls.update();
         if (this.scene.children[4]) {
             if (window.builderSelectedItem) {
@@ -362,6 +365,47 @@ class Thebuilder {
         this.camera.fitToObject(this.currentTowerUUID, this.controls);
         this.animate();
     };
+    makeSliderBar = (id, name, labelText, min = 10, max = 100, snapTo = 10, list, onChangeEventSent) => {
+
+        const range = this.components.c("input")
+        const label = this.components.c("label")
+        const lableValue = this.components.c("div")
+        const div = this.components.c("div")
+        div.className = "form-group"
+        label.innerText = labelText
+        label.for = "labelText"
+        range.type = "range"
+        range.className = ".custom-range"
+        range.id = id
+        range.name = name
+        range.min = min
+        range.max = max
+        range.step = snapTo
+        range.value = "10";
+        lableValue.innerText = "Cuerrent: " + range.value;
+        lableValue.id = id + "_display"
+        if (list) {
+            const ticks = this.components.c("datalist");
+            ticks.id = "ticks_" + range.id
+            range.setAttribute("list", ticks.id)
+            for (let i = 0; i < (list.length); i++) {
+
+                const opt = Components.c("option")
+                opt.value = parseInt(list[i]);
+                opt.setAttribute("label", list[i]);
+                ticks.appendChild(opt)
+            }
+            div.appendChild(ticks)
+        }
+        onChangeEventSent.bind(this)
+        range.addEventListener("oninput", onChangeEventSent);
+        div.appendChild(label)
+        div.appendChild(lableValue)
+        div.appendChild(range)
+
+        return div;
+    }
+
 
     makeSelectBox = (id, name, label, onSelectionEvent) => {
         const Components = new components();
@@ -440,12 +484,14 @@ class Thebuilder {
     };
 
     onChangeShowPad = event => {
-        this.towerPad.visible = event.target.checked
+        this.towerPad.visible = event.target.checked;
     };
 
     onChangeAutoRotate = event => {
-        this.controls.autoRotate = event.target.checked
-
+        this.autoRotate = event.target.checked;
+    };
+    onChangeGroundTransparency = event => {
+        this.floor.material.opacity = parseFloat(event.target.valueAsNumber / 100);
     };
 
     makeFoundationOptions = () => {
@@ -455,7 +501,7 @@ class Thebuilder {
             label: "Show Ground",
             isChecked: false,
             onChangeEvent: this.onChangeShowFloor.bind(this)
-        }
+        };
         let pad = {
             id: "showPad",
             name: "showPad",
@@ -470,12 +516,26 @@ class Thebuilder {
             isChecked: true,
             onChangeEvent: this.onChangeAutoRotate.bind(this)
         };
+
+        const groundOpacitySlider = this.makeSliderBar("groundOpacity", "groundOpacity", "Ground Opacity", 0, 100, 10, null, this.onChangeGroundTransparency)
+
         let options = [floor, pad, rotate];
         const foundationOptions = this.makePartSelectionBox("Foundation");
         options.forEach(option => {
-            const element = this.makeCheckBoxOption(option.id, option.name, option.label, option.isChecked, option.onChangeEvent);
+            const element = this.makeCheckBoxOption(
+                option.id,
+                option.name,
+                option.label,
+                option.isChecked,
+                option.onChangeEvent
+            );
+
             foundationOptions.appendChild(element);
-        })
+            // if (option.name = "showFloor") {
+            //     foundationOptions.appendChild(groundOpacitySlider)
+            // }
+        });
+
         document.getElementById("toolBars").appendChild(foundationOptions);
     };
 
