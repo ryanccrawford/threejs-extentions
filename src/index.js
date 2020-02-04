@@ -119,7 +119,6 @@ function makeSliderBar(id, name, labelText, min = 10, max = 100, snapTo = 10, li
     range.min = min
     range.max = max
     range.step = snapTo
-    range.value = "10";
     lableValue.innerText = "Cuerrent: " + range.value;
     lableValue.id = id + "_display"
     const ticks = Components.c("datalist");
@@ -134,10 +133,10 @@ function makeSliderBar(id, name, labelText, min = 10, max = 100, snapTo = 10, li
     }
     range.setAttribute("oninput", "window.Thebuilder." + onChangeEventSent + "(this)");
     div.appendChild(label)
-    div.appendChild(lableValue)
+    range.setAttribute("valueAsNumber", 10);
     div.appendChild(range)
     div.appendChild(ticks)
-
+    div.appendChild(lableValue)
 
     return div;
 }
@@ -153,6 +152,7 @@ const showHeightSelection = (box) => {
     const card = Components.card(html, "Height")
 
     document.getElementById("toolBars").appendChild(card)
+    document.getElementById("height").oninput(document.getElementById("height"))
 }
 
 const getHeightOption = () => {
@@ -172,9 +172,10 @@ const onStart = event => {
 
         let label = "Select Tower Height"
 
-        const heightSelectBox = makeSliderBar("height", "height", label, minHeight, maxHeight, "all", heightOptions, "onHeightSelect")
-        heightSelectBox.value = "10";
+        const heightSelectBox = makeSliderBar("height", "height", label, minHeight, maxHeight, 10, heightOptions, "onHeightSelect")
+        
         showHeightSelection(heightSelectBox);
+
     }
 }
 
@@ -221,11 +222,11 @@ const onDataRetured = data => {
 
 database.getData("getSeiresOptions", onDataRetured, onDataRetured);
 
-const rotateButton = makeRadioButton("rotate", "rotate", "Rotate", '', '', onToolButtonClick, true, true);
-const panButton = makeRadioButton("pan", "pan", "Pan", '', '', onToolButtonClick, true, true);
-const selectButton = makeRadioButton("select", "select", "Select", '', '', onToolButtonClick, true, true);
-const icons = [rotateButton, panButton, selectButton];
-const bar = makeToolBar(icons);
+// const rotateButton = makeRadioButton("rotate", "rotate", "Rotate", '', '', onToolButtonClick, true, true);
+// const panButton = makeRadioButton("pan", "pan", "Pan", '', '', onToolButtonClick, true, true);
+// const selectButton = makeRadioButton("select", "select", "Select", '', '', onToolButtonClick, true, true);
+// const icons = [rotateButton, panButton, selectButton];
+// const bar = makeToolBar(icons);
 
 const pageBody = pageContainer();
 const top = topContainer();
@@ -234,7 +235,7 @@ const title = titleBar();
 top.appendChild(title);
 
 const newMouseDisplay = new components().mousePosition(0, 0, 0, "mouse");
-
+newMouseDisplay.style.display = "none";
 let sideItems = [newMouseDisplay, towerSelect];
 
 

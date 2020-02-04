@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import TowerCamera from './camera.js'
-import TowerLights from './lights.js'
+import {TowerLights, Atmospher } from './lights.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { PartOptions } from "./partbase.js";
@@ -12,6 +12,7 @@ import Tower25G from "./tower.js"
 import Pad from './pad.js';
 
 class Thebuilder {
+    atmospher;
     scene;
     isPaused = false;
     floorRef;
@@ -56,6 +57,7 @@ class Thebuilder {
     autoRotate = true;
 
     constructor() {
+        
         this.selectedPart = new THREE.Object3D();
         this.components = new components();
         this.raycaster = new THREE.Raycaster();
@@ -140,11 +142,8 @@ class Thebuilder {
         document
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
-        let material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-        let geometry = new THREE.Geometry();
-        this.line = new THREE.Line(geometry, material);
-        this.line.material = material;
-        this.scene.add(this.line);
+       
+      
         this.addEventListeners();
         this.createControls();
         //this.createDragingControls();
@@ -153,7 +152,7 @@ class Thebuilder {
     createControls = () => {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.panSpeed = 0.5;
-        this.controls.rotateSpeed = 0.5;
+        this.controls.rotateSpeed = 0.2;
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.6;
         this.controls.minPolarAngle = -1.4795;
@@ -180,6 +179,11 @@ class Thebuilder {
         this.towerPad.visible = false;
         this.scene.add(this.towerPad);
         this.makeFoundationOptions();
+        this.atmospher = new Atmospher();
+        this.scene.add( this.atmospher.sky  )
+        this.scene.add( this.atmospher.sunSphere    )
+    
+        
         this.animate();
     };
 
@@ -193,7 +197,7 @@ class Thebuilder {
             "mousedown",
             this.onDocumentMouseDown
         );
-
+      
         window.addEventListener("resize", this.onResize);
     };
     onChangePosition = event => {
@@ -237,9 +241,10 @@ class Thebuilder {
     };
 
     update = () => {
-        this.updateMousePosition();
-        this.controls.autoRotate = this.autoRotate;
-
+      //  this.updateMousePosition();
+        if(this.controls.autoRotate !== this.autoRotate){
+            this.controls.autoRotate = this.autoRotate
+        }
         this.controls.update();
         if (this.scene.children[4]) {
             if (window.builderSelectedItem) {
@@ -462,7 +467,7 @@ class Thebuilder {
     getTopCapOptions = () => {
         let dataBases = ["25AG3", "25AG4", "25AG5"];
         let returnH = [];
-        let count = -1;
+        let count = 0;
         for (let i = 0; i < dataBases.length; i++) {
             returnH.push({
                 name: dataBases[i],

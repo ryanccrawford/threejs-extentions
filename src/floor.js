@@ -32,19 +32,30 @@ class Floor extends PartBase {
         //     this.add(gridHelper)
         //     this.sceneRef.add(gridHelper);
         // }
-        const geometry = new THREE.PlaneBufferGeometry(this.gridLength, this.gridWidth);
-        geometry.rotateX(-Math.PI / 2);
-        const floor = new THREE.Mesh(
-            geometry,
-            new THREE.MeshBasicMaterial({
-                color: this.gridColor,
-                //visible: false,
-                transparent: true,
-                opacity: 1,
-            })
+        const floorColor = new THREE.MeshBasicMaterial({
+            color: this.gridColor,
+            //visible: false,
+            transparent: true,
+            opacity: 1,
+        })
+        const floorCurve = new THREE.Mesh(
+                                             new THREE.SphereBufferGeometry( 10000, 100, 100 ),
+                                             floorColor
         );
+        floorCurve.position.setY(-10000)
+       // const geometry = new THREE.PlaneBufferGeometry(this.gridLength, this.gridWidth);
+      //  geometry.rotateX(-Math.PI / 2);
+        // const floor = new THREE.Mesh(
+        //     geometry,
+        //     new THREE.MeshBasicMaterial({
+        //         color: this.gridColor,
+        //         //visible: false,
+        //         transparent: true,
+        //         opacity: 1,
+        //     })
+        // );
 
-        this.importComplete(floor)
+        this.importComplete(floorCurve)
     };
 
 }
