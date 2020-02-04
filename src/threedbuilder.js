@@ -180,6 +180,7 @@ class Thebuilder {
         this.towerPad.visible = false;
         this.scene.add(this.towerPad);
         this.makeFoundationOptions();
+        document.getElementById("mouse").style.display = "none"
         this.animate();
     };
 
