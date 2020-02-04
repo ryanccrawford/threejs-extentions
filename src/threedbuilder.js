@@ -184,6 +184,7 @@ class Thebuilder {
         this.scene.add( this.atmospher.sunSphere    )
     
         
+        document.getElementById("mouse").style.display = "none"
         this.animate();
     };
 
