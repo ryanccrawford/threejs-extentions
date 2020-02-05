@@ -48,7 +48,7 @@ class Atmospher {
         this.effectController = {
             turbidity: 1.2,
             rayleigh: 2.983,
-            mieCoefficient: 0.1,
+            mieCoefficient: 0.001,
             mieDirectionalG: 0.982,
             luminance: 1,
             inclination: 0.49, // elevation / inclination
