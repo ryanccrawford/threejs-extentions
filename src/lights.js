@@ -94,7 +94,7 @@ class Atmospher {
         uniforms["sunPosition"].value.copy(this.sunSphere.position);
         this.sunLight.position.set(this.sunSphere.position)
      
-        this.sunLight.intensity = bright;
+        this.sunLight.intensity = bright / 2;
         this.sunLight.position.normalize();
     }
 
