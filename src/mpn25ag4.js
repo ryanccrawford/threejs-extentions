@@ -23,6 +23,8 @@ class Mpn25ag4 extends PartBase {
 		opt.name = "25AG4"
 	
 		super(opt);
+		this.position.setX(-0.149);
+        this.position.setZ(0.301);
 	}
 
 
