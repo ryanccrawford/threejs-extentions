@@ -222,7 +222,7 @@ class Thebuilder {
     };
     animate = () => {
         this.animationFrameId = requestAnimationFrame(this.animate);
-
+       
         this.renderer.render(this.scene, this.camera);
         this.update();
     };
@@ -246,6 +246,10 @@ class Thebuilder {
         if(this.controls.autoRotate !== this.autoRotate){
             this.controls.autoRotate = this.autoRotate
         }
+        if(this.lights){
+            this.lights.guiChanged()
+        }
+        
         this.controls.update();
         if (this.scene.children[4]) {
             if (window.builderSelectedItem) {

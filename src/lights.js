@@ -90,7 +90,7 @@ class Atmospher {
         this.sunSphere.position.z = this.distance * Math.sin(phi) * Math.cos(theta);
 
         this.sunSphere.visible = this.effectController.sun;
-
+        uniforms["azimuth"].value = bright;
         uniforms["sunPosition"].value.copy(this.sunSphere.position);
         this.sunLight.position.set(this.sunSphere.position)
         console.log(bright)
