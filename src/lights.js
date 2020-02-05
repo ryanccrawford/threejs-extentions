@@ -46,10 +46,10 @@ class Atmospher {
         this.sunSphere.visible = false;
         /// GUI
         this.effectController = {
-            turbidity: 10,
-            rayleigh: 2,
-            mieCoefficient: 0.005,
-            mieDirectionalG: 0.8,
+            turbidity: 1.2,
+            rayleigh: 2.983,
+            mieCoefficient: 0.1,
+            mieDirectionalG: 0.982,
             luminance: 1,
             inclination: 0.49, // elevation / inclination
             azimuth: 0.25, // Facing front,
@@ -83,14 +83,14 @@ class Atmospher {
 
 
         let theta = Math.PI * (bright - 0.5);
-        let phi = 2 * Math.PI * (this.effectController.azimuth - 0.5);
+        let phi = 2 * Math.PI * (bright - 0.5);
 
         this.sunSphere.position.x = this.distance * Math.cos(phi);
         this.sunSphere.position.y = this.distance * Math.sin(phi) * Math.sin(theta);
         this.sunSphere.position.z = this.distance * Math.sin(phi) * Math.cos(theta);
 
-        this.sunSphere.visible = this.effectController.sun;
-        uniforms["azimuth"].value = bright;
+        this.sunLight.visible = this.effectController.sun;
+       
         uniforms["sunPosition"].value.copy(this.sunSphere.position);
         this.sunLight.position.set(this.sunSphere.position)
         console.log(bright)

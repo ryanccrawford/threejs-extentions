@@ -54,7 +54,7 @@ class Thebuilder {
     towerHeight = 10;
     currentTowerUUID;
     validHeights = [10, 20, 30, 35, 40];
-    autoRotate = true;
+    autoRotate = false;
 
     constructor() {
         
@@ -246,8 +246,8 @@ class Thebuilder {
         if(this.controls.autoRotate !== this.autoRotate){
             this.controls.autoRotate = this.autoRotate
         }
-        if(this.lights){
-            this.lights.guiChanged()
+        if(this.atmospher){
+            this.atmospher.guiChanged()
         }
         
         this.controls.update();
