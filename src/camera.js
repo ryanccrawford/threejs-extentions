@@ -7,7 +7,7 @@ class TowerCamera extends THREE.PerspectiveCamera {
         super(25,
             width / height,
             1,
-            8000);
+            1000);
 
         this.position.set(0, 100, 600);
         this.lookAt(0, 0, 0);
@@ -26,7 +26,7 @@ class TowerCamera extends THREE.PerspectiveCamera {
         const fitHeightDistance =
             maxSize / (2 * Math.atan((Math.PI * this.fov) / 360));
         const fitWidthDistance = fitHeightDistance / this.aspect;
-        const distance = 1 * Math.max(fitHeightDistance, fitWidthDistance);
+        const distance = 1.15 * Math.max(fitHeightDistance, fitWidthDistance);
 
         const direction = controls.target
             .clone()
@@ -44,6 +44,7 @@ class TowerCamera extends THREE.PerspectiveCamera {
         this.updateProjectionMatrix();
 
         this.position.copy(controls.target).sub(direction);
+        this.position.setY(this.position.y * 1.2)
     }
 
 }

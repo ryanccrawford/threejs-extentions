@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
-
 class TowerLights extends THREE.Group {
 
 
@@ -34,6 +33,9 @@ class Atmospher {
     effectController;
     distance = 1000
     constructor() {
+
+
+
 
         this.sky = new Sky();
         this.sky.scale.setScalar(1500);
@@ -90,10 +92,10 @@ class Atmospher {
         this.sunSphere.position.z = this.distance * Math.sin(phi) * Math.cos(theta);
 
         this.sunLight.visible = this.effectController.sun;
-       
+
         uniforms["sunPosition"].value.copy(this.sunSphere.position);
         this.sunLight.position.set(this.sunSphere.position)
-     
+
         this.sunLight.intensity = bright / 2;
         this.sunLight.position.normalize();
     }

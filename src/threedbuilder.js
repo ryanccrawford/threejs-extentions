@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import TowerCamera from './camera.js'
-import {TowerLights, Atmospher } from './lights.js'
+import { TowerLights, Atmospher } from './lights.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { PartOptions } from "./partbase.js";
@@ -57,7 +57,7 @@ class Thebuilder {
     autoRotate = false;
 
     constructor() {
-        
+
         this.selectedPart = new THREE.Object3D();
         this.components = new components();
         this.raycaster = new THREE.Raycaster();
@@ -142,8 +142,8 @@ class Thebuilder {
         document
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
-       
-      
+
+
         this.addEventListeners();
         this.createControls();
         //this.createDragingControls();
@@ -180,10 +180,12 @@ class Thebuilder {
         this.scene.add(this.towerPad);
         this.makeFoundationOptions();
         this.atmospher = new Atmospher();
-        this.scene.add( this.atmospher.sky  )
-        this.scene.add( this.atmospher.sunSphere    )
-    
-        
+        this.scene.add(this.atmospher.sky)
+        this.scene.add(this.atmospher.sunSphere)
+        this.atmospher.sunLight.target = this.towerPad;
+        this.scene.add(this.atmospher.sunLight);
+
+
         document.getElementById("mouse").style.display = "none"
         this.animate();
     };
@@ -198,7 +200,7 @@ class Thebuilder {
             "mousedown",
             this.onDocumentMouseDown
         );
-      
+
         window.addEventListener("resize", this.onResize);
     };
     onChangePosition = event => {
@@ -222,7 +224,7 @@ class Thebuilder {
     };
     animate = () => {
         this.animationFrameId = requestAnimationFrame(this.animate);
-       
+
         this.renderer.render(this.scene, this.camera);
         this.update();
     };
@@ -242,14 +244,14 @@ class Thebuilder {
     };
 
     update = () => {
-      //  this.updateMousePosition();
-        if(this.controls.autoRotate !== this.autoRotate){
+        //  this.updateMousePosition();
+        if (this.controls.autoRotate !== this.autoRotate) {
             this.controls.autoRotate = this.autoRotate
         }
-        if(this.atmospher){
+        if (this.atmospher) {
             this.atmospher.guiChanged()
         }
-        
+
         this.controls.update();
         if (this.scene.children[4]) {
             if (window.builderSelectedItem) {
