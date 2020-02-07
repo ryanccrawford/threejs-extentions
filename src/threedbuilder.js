@@ -224,9 +224,9 @@ class Thebuilder {
     };
     animate = () => {
         this.animationFrameId = requestAnimationFrame(this.animate);
-
-        this.renderer.render(this.scene, this.camera);
         this.update();
+        this.renderer.render(this.scene, this.camera);
+
     };
 
     updateMousePosition = () => {
@@ -290,7 +290,7 @@ class Thebuilder {
 
         const intersects = this.raycaster.intersectObject(
             this.currentTowerUUID,
-            true
+            false
         );
         console.log(intersects);
         if (intersects.length > 0) {

@@ -62,12 +62,14 @@ class Atmospher {
 
         this.gui = new GUI();
         this.gui.add(this.effectController, "turbidity", 1.0, 20.0, 0.1).onChange(this.guiChanged);
-        this.gui.add(this.effectController, "rayleigh", 0.0, 4, 0.001).onChange(this.guiChanged);
+        this.gui
+            .add(this.effectController, "rayleigh", 0.0, 4, 0.065)
+            .onChange(this.guiChanged);
         this.gui.add(this.effectController, "mieCoefficient", 0.0, 0.1, 0.001).onChange(this.guiChanged);
         this.gui.add(this.effectController, "mieDirectionalG", 0.0, 1, 0.001).onChange(this.guiChanged);
-        this.gui.add(this.effectController, "luminance", 0.0, 2).onChange(this.guiChanged);
-        this.gui.add(this.effectController, "inclination", 0, 1, 0.0001).onChange(this.guiChanged);
-        this.gui.add(this.effectController, "azimuth", 0, 1, 0.0001).onChange(this.guiChanged);
+        this.gui.add(this.effectController, "luminance", 0.0, 1, 0.001).onChange(this.guiChanged);
+        this.gui.add(this.effectController, "inclination", 0, 1, 0.001).onChange(this.guiChanged);
+        this.gui.add(this.effectController, "azimuth", 0, 1, 0.001).onChange(this.guiChanged);
         this.gui.add(this.effectController, "sun").onChange(this.guiChanged);
         this.guiChanged();
 
@@ -77,15 +79,15 @@ class Atmospher {
     guiChanged = () => {
         let uniforms = this.sky.material.uniforms;
         uniforms["turbidity"].value = this.effectController.turbidity;
-        uniforms["rayleigh"].value = this.effectController.rayleigh;
+        uniforms["rayleigh"].value = 0.065;
         uniforms["mieCoefficient"].value = this.effectController.mieCoefficient;
         uniforms["mieDirectionalG"].value = this.effectController.mieDirectionalG;
         let bright = this.sunBrightness();
-        uniforms["luminance"].value = bright;
+        uniforms["luminance"].value = 0.001;
 
 
-        let theta = Math.PI * (bright - 0.5);
-        let phi = 2 * Math.PI * (bright - 0.5);
+        let theta = Math.PI * ((bright) - 0.5);
+        let phi = 2 * Math.PI * ((bright / 2) - 0.5);
 
         this.sunSphere.position.x = this.distance * Math.cos(phi);
         this.sunSphere.position.y = this.distance * Math.sin(phi) * Math.sin(theta);
@@ -96,7 +98,7 @@ class Atmospher {
         uniforms["sunPosition"].value.copy(this.sunSphere.position);
         this.sunLight.position.set(this.sunSphere.position)
 
-        this.sunLight.intensity = bright / 2;
+        this.sunLight.intensity = bright / 4;
         this.sunLight.position.normalize();
     }
 
