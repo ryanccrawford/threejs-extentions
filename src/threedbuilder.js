@@ -57,7 +57,7 @@ class Thebuilder {
     autoRotate = false;
 
     constructor() {
-        
+
         this.selectedPart = new THREE.Object3D();
         this.components = new components();
         this.raycaster = new THREE.Raycaster();
@@ -142,8 +142,8 @@ class Thebuilder {
         document
             .getElementById(this.appendToElement)
             .appendChild(this.renderer.domElement);
-       
-      
+
+
         this.addEventListeners();
         this.createControls();
         //this.createDragingControls();
@@ -198,7 +198,7 @@ class Thebuilder {
             "mousedown",
             this.onDocumentMouseDown
         );
-      
+
         window.addEventListener("resize", this.onResize);
     };
     onChangePosition = event => {
@@ -222,9 +222,9 @@ class Thebuilder {
     };
     animate = () => {
         this.animationFrameId = requestAnimationFrame(this.animate);
-       
-        this.renderer.render(this.scene, this.camera);
         this.update();
+        this.renderer.render(this.scene, this.camera);
+
     };
 
     updateMousePosition = () => {
@@ -242,15 +242,15 @@ class Thebuilder {
     };
 
     update = () => {
-      //  this.updateMousePosition();
-        if(this.controls.autoRotate !== this.autoRotate){
+        //  this.updateMousePosition();
+        if (this.controls.autoRotate !== this.autoRotate) {
             this.controls.autoRotate = this.autoRotate
         }
         
         if(this.atmosphere){
             this.atmosphere.realTimeUpdate()
         }
-        
+
         this.controls.update();
         if (this.scene.children[4]) {
             if (window.builderSelectedItem) {
@@ -289,7 +289,7 @@ class Thebuilder {
 
         const intersects = this.raycaster.intersectObject(
             this.currentTowerUUID,
-            true
+            false
         );
         console.log(intersects);
         if (intersects.length > 0) {

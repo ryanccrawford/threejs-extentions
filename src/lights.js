@@ -81,26 +81,26 @@ class Atmosphere {
     guiChanged = () => {
         let uniforms = this.sky.material.uniforms;
         uniforms["turbidity"].value = this.effectController.turbidity;
-        uniforms["rayleigh"].value = this.effectController.rayleigh;
+        uniforms["rayleigh"].value = 0.065;
         uniforms["mieCoefficient"].value = this.effectController.mieCoefficient;
         uniforms["mieDirectionalG"].value = this.effectController.mieDirectionalG;
         let bright = this.sunBrightness();
-        uniforms["luminance"].value = bright;
+        uniforms["luminance"].value = 0.001;
 
 
-        let theta = Math.PI * (bright - 0.5);
-        let phi = 2 * Math.PI * (bright - 0.5);
+        let theta = Math.PI * ((bright) - 0.5);
+        let phi = 2 * Math.PI * ((bright / 2) - 0.5);
 
         this.sunSphere.position.x = this.distance * Math.cos(phi);
         this.sunSphere.position.y = this.distance * Math.sin(phi) * Math.sin(theta);
         this.sunSphere.position.z = this.distance * Math.sin(phi) * Math.cos(theta);
 
         this.sunLight.visible = this.effectController.sun;
-       
+
         uniforms["sunPosition"].value.copy(this.sunSphere.position);
         this.sunLight.position.set(this.sunSphere.position)
-     
-        this.sunLight.intensity = bright / 2;
+
+        this.sunLight.intensity = bright / 4;
         this.sunLight.position.normalize();
     }
     sunPosition = (dateTime) => {
