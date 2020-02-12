@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import TowerCamera from './camera.js'
-import {TowerLights, Atmospher } from './lights.js'
+import {TowerLights, Atmosphere } from './lights.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from "three/examples/jsm/controls/DragControls.js";
 import { PartOptions } from "./partbase.js";
@@ -12,7 +12,7 @@ import Tower25G from "./tower.js"
 import Pad from './pad.js';
 
 class Thebuilder {
-    atmospher;
+    atmosphere;
     scene;
     isPaused = false;
     floorRef;
@@ -179,9 +179,9 @@ class Thebuilder {
         this.towerPad.visible = false;
         this.scene.add(this.towerPad);
         this.makeFoundationOptions();
-        this.atmospher = new Atmospher();
-        this.scene.add( this.atmospher.sky  )
-        this.scene.add( this.atmospher.sunSphere    )
+        this.atmosphere = new Atmosphere();
+        this.scene.add( this.atmosphere.sky  )
+        this.scene.add( this.atmosphere.sunSphere )
     
         
         document.getElementById("mouse").style.display = "none"
@@ -246,8 +246,9 @@ class Thebuilder {
         if(this.controls.autoRotate !== this.autoRotate){
             this.controls.autoRotate = this.autoRotate
         }
-        if(this.atmospher){
-            this.atmospher.guiChanged()
+        
+        if(this.atmosphere){
+            this.atmosphere.realTimeUpdate()
         }
         
         this.controls.update();
